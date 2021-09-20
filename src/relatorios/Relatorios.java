@@ -54,9 +54,9 @@ public class Relatorios {
 			html += "<h2 align='center'>EXTRATO BANCÁRIO</h2> \n";
 			html += "<b>De: </b>" + Mascaras.formatData(de, "1") + "<br/>";
 			html += "<b>Até: </b>" + Mascaras.formatData(ate, "1") + "<br/><br/>";
-			html += "<table class='table'>  \n";
-			html += "<thead class='thead-dark'> \n";
-			html += " 	<tr> \n";
+			html += "<table border='1'>\n";
+			html += "<thead> \n";
+			html += " 	<tr bgcolor='#CCC'> \n";
 			html += " 		<th scope='col'>EMISSÃO</th> \n";
 			html += " 		<th scope='col'>DIA DA SEMANA</th> \n";
 			html += " 		<th scope='col'>HORA</th> \n";
@@ -166,10 +166,10 @@ public class Relatorios {
 			html += "<b>De: </b>" + Mascaras.formatData(de, "1") + "<br/>";
 			html += "<b>Até: </b>" + Mascaras.formatData(ate, "1") + "<br/><br/>";
 			html += "<h3 align='left'>GASTOS DIÁRIOS:</h3> \n";
-			html += "<table class='table'>\n";
-			html += "<thead class='thead-dark'> \n";
+			html += "<table border='1'>\n";
+			html += "<thead> \n";
 			html += "<tbody> ";
-			html += "<tr>\n";
+			html += "<tr bgcolor='#CCC'>\n";
 			html += "<th scope='col'>EMISSÃO</th>\n";
 			html += "<th scope='col'>DIA_DA_SEMANA</th>\n";
 			html += "<th scope='col'>VALOR_GASTO</th>\n";
@@ -197,9 +197,9 @@ public class Relatorios {
 			pst = conexao.getConexao().prepareStatement(sqlCC);
 			ResultSet rs2 = pst.executeQuery();
 
-			html += "<table class='table'>\n"; 
-			html += "<thead class='thead-dark'>\n";
-			html += "<tr>\n";
+			html += "<table border='1'>\n"; 
+			html += "<thead>\n";
+			html += "<tr bgcolor='#CCC'>\n";
 			html += "	<th scope='col'>VALOR</th>\n";
 			html += "	<th scope='col'>CENTRO DE CUSTO</th>\n";
 			html += "</tr>\n";
@@ -238,9 +238,9 @@ public class Relatorios {
 				ResultSetMetaData rsmd = rs3.getMetaData();
 				
 				
-				html += "<table class='table'>\n";
-				html += "<thead class='thead-dark'>";
-				html += " <tr>\n";
+				html += "<table border='1'>\n";
+				html += "<thead>";
+				html += " <tr bgcolor='#CCC'>\n";
 				for (int i = 1; i < rsmd.getColumnCount()+1; i++) {
 					html += " <th scope='col'>"+rsmd.getColumnName(i).toString()+"</th>\n";
 				}
