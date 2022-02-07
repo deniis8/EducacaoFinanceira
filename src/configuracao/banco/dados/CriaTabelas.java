@@ -5,10 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
-public class CriaTabelas {
+public class CriaTabelas extends ConexaoBancoDadosSQLite{
 
 	private PreparedStatement pst;
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 
 	public CriaTabelas() {
 		criarTab();
@@ -85,35 +84,35 @@ public class CriaTabelas {
 		sqlTabCC += "     D_E_L_E_T_ CHAR (1) \n";
 		sqlTabCC += " ); ";
 
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlTabCC);
+			PreparedStatement pst = getConexao().prepareStatement(sqlTabCC);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 		String sqlCC = "SELECT * FROM CCUSTO";
 		boolean temReg = false;
 
-		conexao.abrir();
+		abrir();
 		try {
-			pst = conexao.getConexao().prepareStatement(sqlCC);
+			pst = getConexao().prepareStatement(sqlCC);
 			ResultSet rs = pst.executeQuery();
 			while (rs.next()) {
 				temReg = true;
 			}
 		} catch (Exception e) {
 		}
-		conexao.fechar();
+		fechar();
 
 		if (temReg == false) {
 			String sql = "INSERT INTO CCUSTO(DESCRI, D_E_L_E_T_) VALUES (?,?)";
 			for(int i=0; i<cCusto.length; i++) {
-				conexao.abrir();
+				abrir();
 				try {
-					pst = conexao.getConexao().prepareStatement(sql);
+					pst = getConexao().prepareStatement(sql);
 					pst.setString(1, cCusto[i]);
 					pst.setString(2, "");
 					pst.executeUpdate();
@@ -122,7 +121,7 @@ public class CriaTabelas {
 					JOptionPane.showMessageDialog(null,
 							"Erro no Recalculo | (Tabela: LANCAMENTOS) Erro: " + e.getMessage());
 				}
-				conexao.fechar();
+				fechar();
 			}
 		}
 
@@ -137,14 +136,14 @@ public class CriaTabelas {
 		sqlTabLan += "     STATUS     VARCHAR (20), \n";
 		sqlTabLan += "     D_E_L_E_T_ CHAR (1) \n";
 		sqlTabLan += " ); \n";
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlTabLan);
+			PreparedStatement pst = getConexao().prepareStatement(sqlTabLan);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 		sqlTabSald += " CREATE TABLE IF NOT EXISTS SALDOS ( \n";
 		sqlTabSald += "     ID_SALDO  VARCHAR (6)     PRIMARY KEY \n";
@@ -159,14 +158,14 @@ public class CriaTabelas {
 		sqlTabSald += "     ID_LANC   VARCHAR (6)     REFERENCES LANCAMENTOS (ID_LANC) \n";
 		sqlTabSald += "                               UNIQUE \n";
 		sqlTabSald += " ); ";
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlTabSald);
+			PreparedStatement pst = getConexao().prepareStatement(sqlTabSald);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 		sqlViewGM += " CREATE VIEW IF NOT EXISTS VW_GASTOS_MENSAIS AS \n";
 		sqlViewGM += " SELECT \n";
@@ -218,14 +217,14 @@ public class CriaTabelas {
 		sqlViewGM += "     date(DATA, 'start of month', '+1 month', '-1 day') \n";
 		sqlViewGM += " ORDER BY \n";
 		sqlViewGM += "     DATA ASC; \n";
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlViewGM);
+			PreparedStatement pst = getConexao().prepareStatement(sqlViewGM);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 		sqlViewGPD += " CREATE VIEW IF NOT EXISTS VW_GASTOSPD AS \n";
 		sqlViewGPD += " SELECT \n";
@@ -250,14 +249,14 @@ public class CriaTabelas {
 		sqlViewGPD += "     EMISSAO \n";
 		sqlViewGPD += " ORDER BY \n";
 		sqlViewGPD += "     EMISSAO; \n";
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlViewGPD);
+			PreparedStatement pst = getConexao().prepareStatement(sqlViewGPD);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 		sqlViewLAN += " CREATE VIEW IF NOT EXISTS VW_LANCAMENTOS AS \n";
 		sqlViewLAN += " SELECT \n";
@@ -282,14 +281,14 @@ public class CriaTabelas {
 		sqlViewLAN += "     LANC.D_E_L_E_T_ <> '*' \n";
 		sqlViewLAN += " ORDER BY \n";
 		sqlViewLAN += "     LANC.DATA, LANC.HORA; \n";
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlViewLAN);
+			PreparedStatement pst = getConexao().prepareStatement(sqlViewLAN);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 		sqlViewRM += " CREATE VIEW IF NOT EXISTS VW_RECEBIDOS_MENSAIS AS \n";
 		sqlViewRM += " SELECT \n";
@@ -317,14 +316,14 @@ public class CriaTabelas {
 		sqlViewRM += "     date(DATA, 'start of month', '+1 month', '-1 day') \n";
 		sqlViewRM += " ORDER BY \n";
 		sqlViewRM += "     DATA ASC; \n";
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlViewRM);
+			PreparedStatement pst = getConexao().prepareStatement(sqlViewRM);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 		sqlViewREL += " CREATE VIEW IF NOT EXISTS VW_REL001 AS \n";
 		sqlViewREL += " SELECT \n";
@@ -336,14 +335,14 @@ public class CriaTabelas {
 		sqlViewREL += "     SALDOS \n";
 		sqlViewREL += " ORDER BY \n";
 		sqlViewREL += "     DATA, HORA; \n";
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlViewREL);
+			PreparedStatement pst = getConexao().prepareStatement(sqlViewREL);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 		sqlViewSAL += " CREATE VIEW IF NOT EXISTS VW_SALDO AS \n";
 		sqlViewSAL += " SELECT \n";
@@ -367,14 +366,14 @@ public class CriaTabelas {
 		sqlViewSAL += "     SALDOS \n";
 		sqlViewSAL += " ORDER BY \n";
 		sqlViewSAL += "     DATA, HORA; \n";
-		conexao.abrir();
+		abrir();
 		try {
-			PreparedStatement pst = conexao.getConexao().prepareStatement(sqlViewSAL);
+			PreparedStatement pst = getConexao().prepareStatement(sqlViewSAL);
 			pst.execute();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
-		conexao.fechar();
+		fechar();
 
 	}
 
