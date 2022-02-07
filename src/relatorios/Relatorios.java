@@ -1,8 +1,6 @@
 package relatorios;
 
-import email.EnvioEmail;
 import mascaras.Mascaras;
-import conexao.Conexao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,13 +10,16 @@ import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.email.EnvioEmail;
+
 /**
  *
  * @author adenilson.soares
  */
 public class Relatorios {
 
-	Conexao conexao = new Conexao();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 	EnvioEmail envio = new EnvioEmail();
 	PreparedStatement pst;
 	DecimalFormat df = new DecimalFormat("0.00");

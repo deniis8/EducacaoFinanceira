@@ -1,4 +1,4 @@
-package sql;
+package crud;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,17 +8,75 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
 
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import interfaces.CrudLancamentos;
 import mascaras.Mascaras;
-import conexao.Conexao;
 
-public class Inclusao {
+public class CrudLancamento implements CrudLancamentos{
 
-	Conexao conexao = new Conexao();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 	private PreparedStatement pst;
 	private PreparedStatement pst2;
 	private String idLan = "";
 	
-	public void incLanc(String id, String data, String hora, Double valor, String descri, String status, JComboBox<String> boxCC) {
+	
+
+	public PreparedStatement getPst() {
+		return pst;
+	}
+
+
+
+	public void setPst(PreparedStatement pst) {
+		this.pst = pst;
+	}
+
+	@Override
+	public void alterarLancamento(String cod, String data, String hora, double valor, String desc, JComboBox<?> status, JComboBox<?> boxCC) {
+        String rStatus = status.getSelectedItem().toString();
+        String sqlCC = "SELECT ID_CCUSTO FROM CCUSTO WHERE DESCRI='" + boxCC.getSelectedItem() + "'";
+        int idCC = 0;
+
+        conexao.abrir();
+
+        try {
+            setPst(conexao.getConexao().prepareStatement(sqlCC));
+            ResultSet rs = getPst().executeQuery();
+            while (rs.next()) {
+                idCC = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+        	JOptionPane.showMessageDialog(null,"Erro: " + e.getMessage());
+        }
+
+        String sqlCli = "UPDATE LANCAMENTOS SET \n"
+                + "    DATA = ?,\n"
+                + "    HORA = ?,\n"
+                + "    VALOR = ?,\n"
+                + "    STATUS = ?,\n"
+                + "    DESCRICAO = ?,\n"
+                + "    ID_CCUSTO = ?\n"
+                + "WHERE \n"
+                + "    ID_LANC = '" + cod+"'";
+
+        try {
+            setPst(conexao.getConexao().prepareStatement(sqlCli));
+            getPst().setString(1, Mascaras.formatData(data, "2"));
+            getPst().setString(2, hora);
+            getPst().setDouble(3, valor);
+            getPst().setString(4, rStatus);
+            getPst().setString(5, desc);
+            getPst().setInt(6, idCC);
+
+            getPst().executeUpdate();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Erro: " + e.getMessage());
+        }
+        conexao.fechar();
+    }
+	
+	@Override
+	public void incluirLancamento(String id, String data, String hora, Double valor, String descri, String status, JComboBox<String> boxCC) {
 		String sqlCC = "SELECT ID_CCUSTO FROM CCUSTO WHERE DESCRI='" + boxCC.getSelectedItem() + "'";
 		int idCC = 0;
 		idLan = id;
@@ -115,5 +173,18 @@ public class Inclusao {
             JOptionPane.showMessageDialog(null, "Erro no Recalculo | (Tabela: LANCAMENTOS) Erro: " + e.getMessage());
         }
         conexao.fechar();
+        
     }
+	
+    @Override
+	public void excluirLancamento(String cod) {
+		String del = "UPDATE LANCAMENTOS SET D_E_L_E_T_=? WHERE ID_LANC='"+cod+"'";
+		conexao.abrir();
+		try {
+			pst = conexao.getConexao().prepareStatement(del);
+			pst.setString(1, "*");
+			pst.executeUpdate();
+		} catch (Exception e) {}		
+		conexao.fechar();
+	}
 }

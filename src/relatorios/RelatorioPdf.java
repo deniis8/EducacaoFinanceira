@@ -14,7 +14,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import conexao.Conexao;
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -29,11 +29,11 @@ import java.sql.SQLException;
  *
  * @author DeniisDell
  */
-public class RelPDF {
+public class RelatorioPdf {
 
     Document document;
     PdfWriter write;
-    Conexao conexao = new Conexao();
+    ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
     PreparedStatement pst;
 	ResultSet rs;
 	
@@ -102,7 +102,7 @@ public class RelPDF {
     }
 
     public static void main(String[] args) throws FileNotFoundException, DocumentException {
-        RelPDF pdf = new RelPDF();
+        RelatorioPdf pdf = new RelatorioPdf();
         pdf.configPDF();
     }
 

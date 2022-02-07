@@ -1,18 +1,16 @@
-package sql;
+package configuracao.banco.dados;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
-import conexao.Conexao;
-
-public class CriaTabs {
+public class CriaTabelas {
 
 	private PreparedStatement pst;
-	Conexao conexao = new Conexao();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 
-	public CriaTabs() {
+	public CriaTabelas() {
 		criarTab();
 	}
 

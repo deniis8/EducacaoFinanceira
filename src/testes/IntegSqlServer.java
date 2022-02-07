@@ -1,4 +1,4 @@
-package backup;
+package testes;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -10,10 +10,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import conexao.Conexao;
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import testes.IntegSqlServer;
 
 public class IntegSqlServer {
-	 Conexao conexao = new Conexao();
+	 ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 	    PreparedStatement pst;
 
 	    public void backupLanc() { 

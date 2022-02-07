@@ -14,17 +14,17 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import conexao.Conexao;
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
 
 /**
  *
  * @author adenilson.soares
  */
-public class Graficos{
+public class GeraGraficos{
 
 	private DefaultCategoryDataset dados;
 	private JFreeChart grafico;
-    Conexao conexao = new Conexao();
+    ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
     PreparedStatement pst;
     ResultSet rs;
     String nome = "";

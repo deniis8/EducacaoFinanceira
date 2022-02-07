@@ -1,4 +1,4 @@
-package sql;
+package crud;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,11 +7,13 @@ import java.text.ParseException;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import conexao.Conexao;
 
-public class CentroCusto {
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import interfaces.CrudCentroCusto;
+
+public class CrudCentroDeCusto implements CrudCentroCusto{
 	
-	Conexao conexao = new Conexao();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 	PreparedStatement pst;
 	
 	public void selecCC(DefaultTableModel modTabLanc, JTable table) throws ParseException {		
@@ -35,8 +37,8 @@ public class CentroCusto {
 		conexao.fechar();
 	}
 	
-	
-	public void incCC(String descri) {
+	@Override
+	public void incluirCentroCusto(String descri) {
 
 		conexao.abrir();
 		String insert = "";
@@ -54,7 +56,8 @@ public class CentroCusto {
 		
 	}
 		
-	public void altCC(String descri, int codCC) {
+	@Override
+	public void alterarCentroCusto(String descri, int codCC) {
 		
         String sqlCC = "SELECT ID_CCUSTO FROM LANCAMENTOS WHERE ID_CCUSTO="+codCC;
         boolean temReg = false;
@@ -108,8 +111,8 @@ public class CentroCusto {
         conexao.fechar();
     }
 	
-	
-	public void exCluCC(int cod) {
+	@Override
+	public void excluirCentroCusto(int cod) {
 		String del = "UPDATE CCUSTO SET D_E_L_E_T_=? WHERE ID_CCUSTO="+ cod;
 		conexao.abrir();
 		
@@ -148,6 +151,6 @@ public class CentroCusto {
 		for (int i = modelTable.getRowCount() - 1; i >= 0; i--) {
 			modelTable.removeRow(i);
 		}
-	}
 
+}
 }

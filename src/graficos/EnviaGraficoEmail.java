@@ -29,7 +29,7 @@ import javax.swing.JOptionPane;
 import com.itextpdf.text.DocumentException;
 import com.toedter.calendar.JDateChooser;
 
-public class EnvioGrafic {
+public class EnviaGraficoEmail {
 
 	Message message;
 	Properties props = new Properties();
@@ -59,7 +59,7 @@ public class EnvioGrafic {
 	private ImageIcon iconConfirm;
 	private JButton btnConfirm;
 	
-	public EnvioGrafic() {
+	public EnviaGraficoEmail() {
 		janela();
 	}
 	
@@ -178,7 +178,7 @@ public class EnvioGrafic {
 					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 					String deN = df.format(txtSDatD.getDate());
 					String ateN = df.format(txtSDatA.getDate());
-					Graficos graficos = new Graficos();
+					GeraGraficos graficos = new GeraGraficos();
 					try {
 						graficos.gastosCC(deN, ateN,1);
 					} catch (Exception e) {}
@@ -196,7 +196,7 @@ public class EnvioGrafic {
 					} catch (Exception e) {}
 					
 					try {
-						new GrafPDF();
+						new GerarGraficoPdf();
 					} catch (DocumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

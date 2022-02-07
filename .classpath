@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="biblioteca/activation-1.1.1.jar"/>
+	<classpathentry kind="lib" path="biblioteca/commons-lang3-3.11.jar"/>
+	<classpathentry kind="lib" path="biblioteca/iText-5.0.5.jar"/>
+	<classpathentry kind="lib" path="biblioteca/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="biblioteca/jfreechart-1.5.0.jar"/>
+	<classpathentry kind="lib" path="biblioteca/mail.jar"/>
+	<classpathentry kind="lib" path="biblioteca/sqlite-jdbc-3.21.0.jar"/>
+	<classpathentry kind="lib" path="Educacao_Financeira(Executável).jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

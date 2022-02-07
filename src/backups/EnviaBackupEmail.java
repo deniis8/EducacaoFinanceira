@@ -1,4 +1,4 @@
-package backup;
+package backups;
 
 import java.util.Properties;
 import javax.activation.DataHandler;
@@ -16,7 +16,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.swing.JOptionPane;
 
-public class EmailBackup {
+public class EnviaBackupEmail {
 
     Message message;
     Properties props = new Properties();

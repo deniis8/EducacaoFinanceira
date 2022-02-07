@@ -41,27 +41,27 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
-import backup.EmailBackup;
-import backup.IntegSqlServer;
-import conexao.Conexao;
-import graficos.EnvioGrafic;
-import graficos.Graficos;
+
+import backups.EnviaBackupEmail;
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.CriaTabelas;
+import consultas.Consultas;
+import crud.CrudCentroDeCusto;
+import crud.CrudLancamento;
+import graficos.EnviaGraficoEmail;
+import graficos.GeraGraficos;
 import mascaras.Mascaras;
 import pivot.Pivot;
-import recalculo.Recalculo;
+import recalculo.saldos.RecalculaSaldo;
 import relatorios.Relatorios;
-import sql.Atualizacao;
-import sql.CentroCusto;
-import sql.Consultas;
-import sql.CriaTabs;
 import sql.Exclusao;
-import sql.Inclusao;
+import testes.IntegSqlServer;
 
 /**
  *
  * @author adenilson.soares
  */
-public class JanelaP {  
+public class JanelaPrincipal {  
 
 	private JFrame janela;
 	private JTabbedPane tabPane;
@@ -113,17 +113,16 @@ public class JanelaP {
 
 	private String opc = "";
 	Consultas consulta = new Consultas();
-	Inclusao inc = new Inclusao();
-	Atualizacao atua = new Atualizacao();
+	CrudLancamento crudLancamento = new CrudLancamento();
 	Exclusao exc = new Exclusao();
-	CriaTabs criaTabs = new CriaTabs();
+	CriaTabelas criaTabs = new CriaTabelas();
 	JDialog dialogP;
 	//Tabela Centro de Custo
 	DefaultTableModel modelCC;
 	JTable tblTabCC;
 	JScrollPane spCC;
 
-	public JanelaP() {			
+	public JanelaPrincipal() {			
 		janela();
 		menu();
 		ImageIcon icon = new ImageIcon("imagens/logo.png");
@@ -288,7 +287,7 @@ public class JanelaP {
 		itemBKPEmail.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				EmailBackup envEm = new EmailBackup();
+				EnviaBackupEmail envEm = new EnviaBackupEmail();
 				try {
 					envEm.enviaBkp();
 				} catch (Exception e1) {
@@ -620,7 +619,7 @@ public class JanelaP {
 
 				if (opc == "i") {
 					if (!txtEmissao.getText().equals("") && !txtHora.getText().equals("") && !txtValor.getText().equals("") && !txtDesc.getText().equals("")) {
-						Conexao conexao = new Conexao();
+						ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 						PreparedStatement pst;
 						String sqlSelecId="SELECT MAX(ID_LANC) FROM LANCAMENTOS";
 						String id = "";
@@ -637,7 +636,7 @@ public class JanelaP {
 								}					            
 					        } catch (SQLException e) {}
 					    conexao.fechar();
-						inc.incLanc(id,txtEmissao.getText(), txtHora.getText(), Double.parseDouble(txtValor.getText()),
+					    crudLancamento.incluirLancamento(id,txtEmissao.getText(), txtHora.getText(), Double.parseDouble(txtValor.getText()),
 								txtDesc.getText(), boxStatus.getSelectedItem().toString(), boxCCusto);
 						limpCampos(opc);
 						try {
@@ -652,7 +651,7 @@ public class JanelaP {
 						JOptionPane.showMessageDialog(null, "Favor preencher os campos obrigatórios!");
 					}
 				} else if (opc == "e") {
-					atua.atualiLanc(txtCod.getText(), txtEmissao.getText(), txtHora.getText(),
+					crudLancamento.alterarLancamento(txtCod.getText(), txtEmissao.getText(), txtHora.getText(),
 							Double.parseDouble(txtValor.getText()), txtDesc.getText(), boxStatus, boxCCusto);
 					try {
 						consulta.selectLanca(model, tblTab, lblTotalAP, lblTotalP, lblTotalAR, lblTotalR);
@@ -666,7 +665,7 @@ public class JanelaP {
 					int resposta = JOptionPane.showConfirmDialog(null, "Deseja realmente excluir esse Lançamento?",
 							"Deseja Lançamento?", JOptionPane.YES_NO_OPTION);
 					if (resposta == JOptionPane.YES_OPTION) {
-						exc.excluirLan(txtCod.getText());
+						crudLancamento.excluirLancamento(txtCod.getText());
 						try {
 							consulta.selectLanca(model, tblTab, lblTotalAP, lblTotalP, lblTotalAR, lblTotalR);
 						} catch (ParseException e) {
@@ -707,7 +706,7 @@ public class JanelaP {
 	}
 	
 	public void janelaCCusto() {
-		CentroCusto sqlCC = new CentroCusto();
+		CrudCentroDeCusto crudCentroCusto = new CrudCentroDeCusto();
 		JDialog dialogCC = new JDialog();
 		JButton btnCcInc = new JButton("Incluir");
 		JButton btnCcAlt = new JButton("Alterar");
@@ -737,7 +736,7 @@ public class JanelaP {
 		dialogCC.add(btnCcExc);
 		
 		try {
-			sqlCC.selecCC(modelCC, tblTabCC);
+			crudCentroCusto.selecCC(modelCC, tblTabCC);
 		} catch (ParseException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
@@ -795,7 +794,7 @@ public class JanelaP {
 			titulo = "Excluir";
 		}
 				
-		CentroCusto sqlCC = new CentroCusto();
+		CrudCentroDeCusto crudCentroCusto = new CrudCentroDeCusto();
 		JDialog dialogCC = new JDialog();
 		JLabel lblCodCC = new JLabel("Cód:");
 		JTextField txtCodCC = new JTextField();
@@ -848,10 +847,10 @@ public class JanelaP {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(opc == "1") {
-					sqlCC.incCC(txtDescri.getText());
+					crudCentroCusto.incluirCentroCusto(txtDescri.getText());
 					dialogCC.dispose();
 					try {		
-						sqlCC.selecCC(modelCC, tblTabCC);
+						crudCentroCusto.selecCC(modelCC, tblTabCC);
 						boxGCCusto.removeAllItems();
 						boxGCCusto.addItem("Todos");
 						consulta.selecBox(boxGCCusto, "");						
@@ -860,13 +859,13 @@ public class JanelaP {
 					}
 				}
 				else if(opc == "2"){
-					sqlCC.altCC(txtDescri.getText(), Integer.parseInt(cod));
+					crudCentroCusto.alterarCentroCusto(txtDescri.getText(), Integer.parseInt(cod));
 					dialogCC.dispose();					
 					boxGCCusto.removeAllItems();
 					boxGCCusto.addItem("Todos");
 					consulta.selecBox(boxGCCusto, "");
 					try {		
-						sqlCC.selecCC(modelCC, tblTabCC);
+						crudCentroCusto.selecCC(modelCC, tblTabCC);
 					} catch (ParseException e1) {
 						JOptionPane.showMessageDialog(null, "Erro: " + e1.getMessage());
 					}
@@ -875,13 +874,13 @@ public class JanelaP {
 					Object[] options = { "Sim", "Não", "Cancelar" };
 			    	int resposta = JOptionPane.showOptionDialog(null, "Tem certeza que deseja excluir esse registro?", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 			    	if(resposta==0) {
-			    		sqlCC.exCluCC(Integer.parseInt(cod));
+			    		crudCentroCusto.excluirCentroCusto(Integer.parseInt(cod));
 			    		dialogCC.dispose();			    		
 			    		boxGCCusto.removeAllItems();
 						boxGCCusto.addItem("Todos");
 						consulta.selecBox(boxGCCusto, "");
 			    		try {		
-							sqlCC.selecCC(modelCC, tblTabCC);
+			    			crudCentroCusto.selecCC(modelCC, tblTabCC);
 						} catch (ParseException e1) {
 							JOptionPane.showMessageDialog(null, "Erro: " + e1.getMessage());
 						}
@@ -925,7 +924,7 @@ public class JanelaP {
         }
         if (resposta == 0 || resposta == 1) {
         	dlgProgress.setVisible(true);
-            Recalculo rec = new Recalculo(progress, dlgProgress, lblStatus, lblSaldo, lblInvF, idReg, data);
+            RecalculaSaldo rec = new RecalculaSaldo(progress, dlgProgress, lblStatus, lblSaldo, lblInvF, idReg, data);
     		Thread t = new Thread(rec);
     		t.start();
         }
@@ -1150,7 +1149,7 @@ public class JanelaP {
 					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 					String deN = df.format(txtGDe.getDate());
 					String ateN = df.format(txtGAte.getDate());
-					Graficos graficos = new Graficos();
+					GeraGraficos graficos = new GeraGraficos();
 					if (checSCC.isSelected() || checECC.isSelected() || checM.isSelected()) {
 						if (checSCC.isSelected()) {
 							try {
@@ -1207,7 +1206,7 @@ public class JanelaP {
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new EnvioGrafic();
+				new EnviaGraficoEmail();
 			}
 		});
 	}
@@ -1246,6 +1245,6 @@ public class JanelaP {
 	}
 
 	public static void main(String[] args) {
-		new JanelaP().janela.setVisible(true);
+		new JanelaPrincipal().janela.setVisible(true);
 	}
 }
