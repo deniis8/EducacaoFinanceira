@@ -1,4 +1,4 @@
-package janelas;
+package janela.principal;
 
 import java.awt.Color;
 import java.awt.Desktop;
