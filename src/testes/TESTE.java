@@ -6,10 +6,10 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import conexao.Conexao;
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
 
 public class TESTE {
-	Conexao conexao = new Conexao();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 	PreparedStatement pst;
 	PreparedStatement pst2;
 	public static void main(String[] args) {

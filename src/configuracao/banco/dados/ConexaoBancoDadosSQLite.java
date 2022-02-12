@@ -1,11 +1,11 @@
-package conexao;
+package configuracao.banco.dados;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
-public class Conexao {
+public class ConexaoBancoDadosSQLite {
 
     private static Connection con = null;
 

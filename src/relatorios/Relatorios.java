@@ -1,8 +1,6 @@
 package relatorios;
 
-import email.EnvioEmail;
 import mascaras.Mascaras;
-import conexao.Conexao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,14 +10,16 @@ import java.text.DecimalFormat;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.email.EnvioEmail;
+
 /**
  *
  * @author adenilson.soares
  */
 public class Relatorios {
 
-	Conexao conexao = new Conexao();
-	EnvioEmail envio = new EnvioEmail();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();	
 	PreparedStatement pst;
 	DecimalFormat df = new DecimalFormat("0.00");
 	String titulo = "";
@@ -124,7 +124,8 @@ public class Relatorios {
 		Object[] options = { "Sim", "Não" };
 		int resposta = JOptionPane.showOptionDialog(null, "Deseja receber o relatório por e-mail?", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 		if (resposta == 0) {
-			envio.email(html,titulo);
+			EnvioEmail env = new EnvioEmail(html, titulo, "1");
+			env.enviar();
 		}
 
 	}
@@ -289,7 +290,8 @@ public class Relatorios {
 		Object[] options = { "Sim", "Não" };
 		int resposta = JOptionPane.showOptionDialog(null, "Deseja receber o relatório por e-mail?", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 		if (resposta == 0) {
-			envio.email(html, titulo);
+			EnvioEmail env = new EnvioEmail(html, titulo, "1");
+			env.enviar();
 		}
 		
 

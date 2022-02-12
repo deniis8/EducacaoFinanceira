@@ -13,7 +13,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 
 
-public class GrafPDF {
+public class GerarGraficoPdf {
 
      public static final String RESULT ="arquivos/pdf/graficos.pdf";
 
@@ -26,7 +26,7 @@ public class GrafPDF {
      public static final String GRAFECC ="imagens/graficos/grafico_ecc_pdf.PNG";
      public static final String GRAFM ="imagens/graficos/grafico_m_pdf.PNG";
      
-     public GrafPDF() throws DocumentException, IOException {
+     public GerarGraficoPdf() throws DocumentException, IOException {
     	 geraPDF();
 	}
 

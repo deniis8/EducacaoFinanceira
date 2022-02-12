@@ -1,4 +1,4 @@
-package backup;
+package backups;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -10,7 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import conexao.Conexao;
+import backups.BackupTxt;
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
 
 /**
  *
@@ -18,7 +19,7 @@ import conexao.Conexao;
  */
 public class BackupTxt { 
 
-    Conexao conexao = new Conexao();
+    ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
     PreparedStatement pst;
 
     public void backupLanc() {

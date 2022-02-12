@@ -6,11 +6,11 @@ import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 
-import conexao.Conexao;
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
 
 public class Pivot {
 
-	Conexao conexao = new Conexao();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 
 	/**
 	 * Cria a tabela dinâmica e insere os registros

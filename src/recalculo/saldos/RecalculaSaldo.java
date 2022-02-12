@@ -1,7 +1,5 @@
-package recalculo;
+package recalculo.saldos;
 
-import sql.Consultas;
-import conexao.Conexao;
 import mascaras.Mascaras;
 
 import java.sql.PreparedStatement;
@@ -15,13 +13,16 @@ import javax.swing.JProgressBar;
 
 import org.apache.commons.lang3.StringUtils;
 
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import consultas.Consultas;
+
 /**
  *
  * @author adenilson.soares
  */
-public class Recalculo implements Runnable {
+public class RecalculaSaldo implements Runnable {
 
-    Conexao conexao = new Conexao();
+    ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
     Consultas consulta = new Consultas();
     PreparedStatement pst;
     JProgressBar pB;
@@ -35,7 +36,7 @@ public class Recalculo implements Runnable {
     String data = "";
     String idSaldo ="000001";
 
-    public Recalculo(JProgressBar pB, JDialog dlg, JLabel lblValor, JLabel lblSaldo, JLabel lblInvF, String idReg, String data) {
+    public RecalculaSaldo(JProgressBar pB, JDialog dlg, JLabel lblValor, JLabel lblSaldo, JLabel lblInvF, String idReg, String data) {
         this.pB = pB;
         this.dlg = dlg;
         this.lblValor = lblValor;

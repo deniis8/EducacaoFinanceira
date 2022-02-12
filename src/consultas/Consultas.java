@@ -1,7 +1,7 @@
-package sql;
+package consultas;
 
 import mascaras.Mascaras;
-import conexao.Conexao;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +21,8 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
+import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+
 /**
  *
  * @author adenilson.soares
@@ -31,7 +33,7 @@ public class Consultas {
 	private double totalAR;
 	private double totalR;
 	DecimalFormat dFN = new DecimalFormat("0.00");
-	Conexao conexao = new Conexao();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
 	PreparedStatement pst;
 
 	public void selectLanca(DefaultTableModel modTabLanc, JTable table, JLabel lblTotalAP, JLabel lblTotalP, JLabel lblTotalAR, JLabel lblTotalR) throws ParseException {
