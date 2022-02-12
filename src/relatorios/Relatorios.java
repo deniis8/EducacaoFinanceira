@@ -19,8 +19,7 @@ import configuracao.email.EnvioEmail;
  */
 public class Relatorios {
 
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
-	EnvioEmail envio = new EnvioEmail();
+	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();	
 	PreparedStatement pst;
 	DecimalFormat df = new DecimalFormat("0.00");
 	String titulo = "";
@@ -125,7 +124,8 @@ public class Relatorios {
 		Object[] options = { "Sim", "Não" };
 		int resposta = JOptionPane.showOptionDialog(null, "Deseja receber o relatório por e-mail?", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 		if (resposta == 0) {
-			envio.email(html,titulo);
+			EnvioEmail env = new EnvioEmail(html, titulo, "1");
+			env.enviar();
 		}
 
 	}
@@ -290,7 +290,8 @@ public class Relatorios {
 		Object[] options = { "Sim", "Não" };
 		int resposta = JOptionPane.showOptionDialog(null, "Deseja receber o relatório por e-mail?", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 		if (resposta == 0) {
-			envio.email(html, titulo);
+			EnvioEmail env = new EnvioEmail(html, titulo, "1");
+			env.enviar();
 		}
 		
 

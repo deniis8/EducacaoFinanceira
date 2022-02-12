@@ -41,14 +41,13 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
-
-import backups.EnviaBackupEmail;
 import configuracao.banco.dados.ConexaoBancoDadosSQLite;
 import configuracao.banco.dados.CriaTabelas;
+import configuracao.email.EnvioEmail;
 import consultas.Consultas;
 import crud.CrudCentroDeCusto;
 import crud.CrudLancamento;
-import graficos.EnviaGraficoEmail;
+import graficos.GraficosPdf;
 import graficos.GeraGraficos;
 import mascaras.Mascaras;
 import pivot.Pivot;
@@ -287,9 +286,9 @@ public class JanelaPrincipal {
 		itemBKPEmail.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				EnviaBackupEmail envEm = new EnviaBackupEmail();
+				EnvioEmail env = new EnvioEmail(null,"EDUCAÇÃO FINANCEIRA: BACKUP BANCO DE DADOS","2");
 				try {
-					envEm.enviaBkp();
+					env.enviar();
 				} catch (Exception e1) {
 				}
 			}
@@ -1206,7 +1205,7 @@ public class JanelaPrincipal {
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				new EnviaGraficoEmail();
+				new GraficosPdf();
 			}
 		});
 	}

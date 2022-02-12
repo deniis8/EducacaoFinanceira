@@ -1,21 +1,74 @@
 package configuracao.email;
 
-import java.util.Properties;   
+import java.util.Properties;
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.swing.JOptionPane;
+
+import ler.arquivo.LerEmailSenha;
 
 public class EnvioEmail {
     
-    public void email(String texto, String titulo){
-        Properties props = new Properties();
+	private Message message;
+	private Properties props = new Properties();
+	private Session session;
+	private FileDataSource fds;
+	
+	private String texto;
+	private String titulo; 
+	private String opc;
+	
+    /**
+     * 
+     * @param texto
+     * @param titulo
+     * @param opc = 1 - Relatório 2 - Backup 3 - Gráfico
+     */
+	
+	public String getTexto() {
+		return texto;
+	}
+
+	public void setTexto(String texto) {
+		this.texto = texto;
+	}
+
+	public String getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public String getOpc() {
+		return opc;
+	}
+
+	public void setOpc(String opc) {
+		this.opc = opc;
+	}
+	
+	public EnvioEmail(String texto, String titulo, String opc) {
+		setTexto(texto);
+		setTexto(titulo);
+		setOpc(opc);		
+	}
+    
+    public void enviar(){
+        
         /**
-         * * Par?metros de conex?o com servidor Hotmail
+         * * Parametros de conex?o com servidor Hotmail
          */
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.host", "smtp.live.com");
@@ -24,38 +77,48 @@ public class EnvioEmail {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "587");
-        Session session;
         
-        //Mensagem informativa para configurações de envios de e-mails
-        JOptionPane.showInternalMessageDialog(null, "Insira as suas configurações de e-mail na classe EnvioEmail.java");
+        //Ler e-mail e senha
+        LerEmailSenha ler = new LerEmailSenha();
         
         session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("seu_e-mail", "sua_senha");
+                return new PasswordAuthentication(ler.getEmail(), ler.getSenha());
             }
         });
+        
         /**
-         * * Ativa Debug para sess?o
+         * * Ativa Debug para sessao
          */
         session.setDebug(true);
         try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("seu_e-mail")); // Remetente 
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("seu_e-mail"));
-            // Destinat?rio(s) 
-            message.setSubject(titulo);
-            // Assunto //
-            //message.setText(texto);
-            message.setContent(texto, "text/html;charset=utf-8");
-            /**
-             * * M?todo para enviar a mensagem criada
-             */
+            message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(ler.getEmail())); // Remetente 
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(ler.getEmail()));
+            
+            message.setSubject(getTitulo());
+            if(getOpc() == "1") {
+            	message.setContent(getTexto(), "text/html;charset=utf-8");
+            }else if(getOpc() == "2" || getOpc() == "3") {
+            	
+            	MimeBodyPart mbp2 = new MimeBodyPart();
+            	if(getOpc() == "3") {
+            		fds = new FileDataSource("arquivos/pdf/graficos.pdf");
+            	}else {
+            		fds = new FileDataSource("banco_dados/LANCCONTAS.db3");
+            	}                
+                mbp2.setDataHandler(new DataHandler(fds));
+                mbp2.setFileName(fds.getName());
+                Multipart mp = new MimeMultipart();
+                mp.addBodyPart(mbp2);
+                message.setContent(mp);            	
+            }
+            
             Transport.send(message);
-            //System.out.println("Feito!!!");
             JOptionPane.showMessageDialog(null, "E-mail enviado com sucesso!");
-        } catch (MessagingException e) {
-            JOptionPane.showMessageDialog(null, "O e-mail não foi enviado, verifique a conexão com a internet.");
+        } catch (MessagingException ex) {
+            JOptionPane.showMessageDialog(null, "Erro: " + ex.getMessage());
         } 
     }
 }
