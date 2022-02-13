@@ -30,7 +30,7 @@ public class LerEmailSenha {
 	
 	public void ler() {
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("C:/Projetos/Java/EducacaoFinanceira/arquivos/config_email.txt"));
+			BufferedReader br = new BufferedReader(new FileReader("arquivos/config_email.txt"));
 			setEmail(br.readLine());
 			setSenha(br.readLine());
 			br.close();	
