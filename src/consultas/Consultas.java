@@ -92,7 +92,8 @@ public class Consultas {
 	}
 
 	public void selectInvF(JLabel lblInvF) {
-		String slqUlt = "SELECT PRINTF('%.2f',SUM(VALORLAN)) FROM SALDOS WHERE CCUSTO IN('Investimento Fixo','Juros Positivo')";
+		//String slqUlt = "SELECT PRINTF('%.2f',SUM(VALORLAN)) FROM SALDOS WHERE CCUSTO IN('Investimento Fixo','Juros Positivo')";
+		String slqUlt = "SELECT PRINTF('%.2f',SUM(VALORLAN)) FROM SALDOS WHERE CCUSTO IN('Investimento Fixo')";
 
 		conexao.abrir();
 		try {

@@ -180,7 +180,7 @@ public class GraficosPdf {
 					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 					String deN = df.format(txtSDatD.getDate());
 					String ateN = df.format(txtSDatA.getDate());
-					Graficos graficos = new Graficos();
+					GeraGraficos graficos = new GeraGraficos();
 					try {
 						graficos.gastosCC(deN, ateN,1);
 					} catch (Exception e) {}
@@ -198,7 +198,7 @@ public class GraficosPdf {
 					} catch (Exception e) {}
 					
 					try {
-						new GrafPDF();
+						new GerarGraficoPdf();
 					} catch (DocumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

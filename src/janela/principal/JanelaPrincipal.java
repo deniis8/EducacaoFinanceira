@@ -53,7 +53,7 @@ import mascaras.Mascaras;
 import pivot.Pivot;
 import recalculo.saldos.RecalculaSaldo;
 import relatorios.Relatorios;
-import sql.Exclusao;
+//import sql.Exclusao;
 import testes.IntegSqlServer;
 
 /**
@@ -113,7 +113,7 @@ public class JanelaPrincipal {
 	private String opc = "";
 	Consultas consulta = new Consultas();
 	CrudLancamento crudLancamento = new CrudLancamento();
-	Exclusao exc = new Exclusao();
+	//Exclusao exc = new Exclusao();
 	CriaTabelas criaTabs = new CriaTabelas();
 	JDialog dialogP;
 	//Tabela Centro de Custo
