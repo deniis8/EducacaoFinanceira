@@ -41,7 +41,7 @@ public class Consultas {
 		totalP = 0;
 		totalAR = 0;
 		totalR = 0;
-		String sql = "SELECT ID, DATA, DIAS_SEMANA, VALOR, DESCRICAO, CCENTRO, STATUS FROM VW_LANCAMENTOS ";
+		String sql = "SELECT ID, DATA, DIAS_SEMANA, VALOR, DESCRICAO, CODCCUSTO|| '-' ||CCENTRO, STATUS FROM VW_LANCAMENTOS ";
 		conexao.abrir();
 		zeraTabelaPrincipal(modTabLanc);
 		try {
@@ -142,7 +142,7 @@ public class Consultas {
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			String deN = df.format(de.getDate());
 	        String ateN = df.format(ate.getDate());
-			String query = "SELECT ID, DATA, DIAS_SEMANA, VALOR, DESCRICAO, CCENTRO, STATUS FROM VW_LANCAMENTOS WHERE "; 
+			String query = "SELECT ID, DATA, DIAS_SEMANA, VALOR, DESCRICAO, CODCCUSTO|| '-' ||CCENTRO, STATUS FROM VW_LANCAMENTOS WHERE "; 
 			
 					
 					if(recebido.isSelected()) {
