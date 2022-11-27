@@ -76,7 +76,7 @@ public class CrudCentroDeCusto implements CrudCentroCusto{
         
         if(temReg==true) {
         	Object[] options = { "Sim", "Não", "Cancelar" };
-        	int resposta = JOptionPane.showOptionDialog(null, "Esse sentro de custo está em uso. Deseja alterar mesmo assim?", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        	int resposta = JOptionPane.showOptionDialog(null, "Esse centro de custo está em uso. Deseja alterar mesmo assim?", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         	
         	if(resposta == 0) {
         		 String sqlCli = "UPDATE CCUSTO SET \n"
@@ -140,7 +140,7 @@ public class CrudCentroDeCusto implements CrudCentroCusto{
 				JOptionPane.showMessageDialog(null,"Erro: " + e.getMessage());
 			}	
 		}else {
-			JOptionPane.showMessageDialog(null,"Não é possível excluir. Existe lançamento(s) com esse centro de custo.");
+			JOptionPane.showMessageDialog(null,"Não é possível excluir. Existe lançamento(s) com esse centro de custo atrelado.");
 		}
 			
 			
