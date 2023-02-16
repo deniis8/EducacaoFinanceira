@@ -1,24 +1,19 @@
 package janela.principal;
 
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -33,28 +28,18 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
 import configuracao.banco.dados.ConexaoBancoDadosSQLite;
-import configuracao.banco.dados.CriaTabelas;
-import configuracao.email.EnvioEmail;
 import consultas.Consultas;
 import crud.CrudCentroDeCusto;
 import crud.CrudLancamento;
-import graficos.GraficosPdf;
-import graficos.GeraGraficos;
 import mascaras.Mascaras;
-import pivot.Pivot;
 import recalculo.saldos.RecalculaSaldo;
-import relatorios.Relatorios;
-//import sql.Exclusao;
-import testes.IntegSqlServer;
 
 /**
  *
@@ -65,17 +50,12 @@ public class JanelaPrincipal {
 	private JFrame janela;
 	private JTabbedPane tabPane;
 	private JPanel panelGeren;
-	private JPanel panelGraf;
 	private JMenuBar menuBar;
 	private JMenu menu;
 	private JMenuItem itemAtuali;
-	private JMenuItem itemAbrirP;
 	private JMenuItem itemSair;
 	private JMenu menuRec;
 	private JMenuItem itemRec;
-	private JMenu menuBKP;
-	private JMenuItem itemBKPEmail;
-	private JMenuItem itemBKPTxt;
 	private JMenu menuCC;
 	private JMenuItem itemCC;
 	private JLabel lblDe;
@@ -101,7 +81,6 @@ public class JanelaPrincipal {
 	private DefaultTableModel model;
 	private JTable tblTab;
 	private JScrollPane sp;
-	//private JPanel painelTab;
 	private JTextField txtCod;
 	private JFormattedTextField txtEmissao;
 	private JFormattedTextField txtHora;
@@ -113,10 +92,7 @@ public class JanelaPrincipal {
 	private String opc = "";
 	Consultas consulta = new Consultas();
 	CrudLancamento crudLancamento = new CrudLancamento();
-	//Exclusao exc = new Exclusao();
-	CriaTabelas criaTabs = new CriaTabelas();
 	JDialog dialogP;
-	//Tabela Centro de Custo
 	DefaultTableModel modelCC;
 	JTable tblTabCC;
 	JScrollPane spCC;
@@ -127,8 +103,6 @@ public class JanelaPrincipal {
 		ImageIcon icon = new ImageIcon("imagens/logo.png");
 		janela.setIconImage(icon.getImage());
 		configTab();
-		relatorios();
-		graficos();
 		consulta.selectUlt(lblSaldo);
 		consulta.selectInvF(lblInvF);
 		consulta.selectInvV(lblInvV);		
@@ -169,13 +143,9 @@ public class JanelaPrincipal {
 		menuBar = new JMenuBar();
 		menu = new JMenu("Menu");
 		itemAtuali = new JMenuItem("Atualizar");
-		itemAbrirP = new JMenuItem("Abrir Planilha");
 		itemSair = new JMenuItem("Sair");
 		menuRec = new JMenu("Recalculo");
 		itemRec = new JMenuItem("Recalcular Saldo");
-		menuBKP = new JMenu("Backup");
-		itemBKPEmail = new JMenuItem("Enviar BKP/E-mail");
-		itemBKPTxt = new JMenuItem("Realixar BKP em TXT");
 		
 		menuCC = new JMenu("Centro de Custo");
 		itemCC = new JMenuItem("Cadastro");
@@ -214,7 +184,7 @@ public class JanelaPrincipal {
 		checAPagar.setBounds(230, 65, 70, 20);
 		boxGCCusto.setBounds(320, 63, 220, 20);
 		boxGCCusto.addItem("Todos");
-		consulta.selecBox(boxGCCusto, "");
+		consulta.selectComboboxCentroCusto(boxGCCusto, "");
 		btnPesq.setBounds(530, 56, 70, 32);	
 		lblSaldo.setBounds(03, 475, 200, 13);
 		lblInvF.setBounds(03, 490, 200, 13);
@@ -264,12 +234,6 @@ public class JanelaPrincipal {
 				consulta.selectInvV(lblInvV);
 			}
 		});
-		itemAbrirP.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				abrirPlan();
-			}
-		});
 		itemSair.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -283,30 +247,10 @@ public class JanelaPrincipal {
 				rodarThred();
 			}
 		});
-		itemBKPEmail.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				EnvioEmail env = new EnvioEmail(null,"EDUCAÇÃO FINANCEIRA: BACKUP BANCO DE DADOS","2");
-				try {
-					env.enviar();
-				} catch (Exception e1) {
-				}
-			}
-		});
-		itemBKPTxt.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				IntegSqlServer integ = new IntegSqlServer();
-				integ.backupLanc();
-				integ.backupCCusto();
-				integ.backupSaldos();
-			}
-		});
 		
 		itemCC.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//Cadastro de centro de custo
 				janelaCCusto();
 			}
 		});
@@ -354,7 +298,7 @@ public class JanelaPrincipal {
 				opc = "i";
 				janelaInc("Incluir");
 				limpCampos(opc);
-				consulta.selecBox(boxCCusto, "S");
+				consulta.selectComboboxCentroCusto(boxCCusto, "S");
 				dialogP.setVisible(true);
 			}
 		});
@@ -384,7 +328,7 @@ public class JanelaPrincipal {
 					limpCampos(opc);
 					txtCod.setText(tblTab.getValueAt(indiceLinha, 0).toString());
 					if (!txtCod.getText().equals("")) {
-						consulta.selecBox(boxCCusto, "S");
+						consulta.selectComboboxCentroCusto(boxCCusto, "S");
 						consulta.selectLanJ(txtCod.getText(), txtEmissao, txtHora, txtValor, txtDesc,
 								boxStatus, boxCCusto);
 						dialogP.setVisible(true);
@@ -420,7 +364,7 @@ public class JanelaPrincipal {
 					limpCampos(opc);
 					txtCod.setText(tblTab.getValueAt(indiceLinha, 0).toString());
 					if (!txtCod.getText().equals("")) {
-						consulta.selecBox(boxCCusto, "S");
+						consulta.selectComboboxCentroCusto(boxCCusto, "S");
 						consulta.selectLanJ(txtCod.getText(), txtEmissao, txtHora, txtValor, txtDesc,
 								boxStatus, boxCCusto);
 						editCampos();
@@ -458,15 +402,11 @@ public class JanelaPrincipal {
 
 	public void menu() {
 		menu.add(itemAtuali);
-		menu.add(itemAbrirP);
 		menu.add(itemSair);
 		menuRec.add(itemRec);
-		menuBKP.add(itemBKPEmail);
-		menuBKP.add(itemBKPTxt);
 		menuCC.add(itemCC);
 		menuBar.add(menu);
 		menuBar.add(menuRec);
-		menuBar.add(menuBKP);
 		menuBar.add(menuCC);
 		janela.setJMenuBar(menuBar);
 
@@ -613,29 +553,12 @@ public class JanelaPrincipal {
 				ImageIcon iconN = new ImageIcon("imagens/brilho/confirmarCa.png");
 				btnConfirm.setIcon(iconN);
 			}
-
 			public void mouseClicked(MouseEvent arg0) {
 
 				if (opc == "i") {
 					if (!txtEmissao.getText().equals("") && !txtHora.getText().equals("") && !txtValor.getText().equals("") && !txtDesc.getText().equals("")) {
-						ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
-						PreparedStatement pst;
-						String sqlSelecId="SELECT MAX(ID_LANC) FROM LANCAMENTOS";
-						String id = "";
-						conexao.abrir();
-					        try {
-					            pst = conexao.getConexao().prepareStatement(sqlSelecId);
-					            ResultSet rs = pst.executeQuery();
-					            while (rs.next()) {
-					            	if(rs.getString(1)==null) {
-					            		id = "000001";
-					            	}else {
-					            		id = Integer.toString(Integer.parseInt(rs.getString(1))+1);
-					            	}					            	
-								}					            
-					        } catch (SQLException e) {}
-					    conexao.fechar();
-					    crudLancamento.incluirLancamento(id,txtEmissao.getText(), txtHora.getText(), Double.parseDouble(txtValor.getText()),
+										
+					    crudLancamento.incluirLancamento(txtEmissao.getText(), txtHora.getText(), Double.parseDouble(txtValor.getText()),
 								txtDesc.getText(), boxStatus.getSelectedItem().toString(), boxCCusto);
 						limpCampos(opc);
 						try {
@@ -645,7 +568,7 @@ public class JanelaPrincipal {
 						consulta.selectUlt(lblSaldo);
 						consulta.selectInvF(lblInvF);
 						consulta.selectInvV(lblInvV);
-						consulta.selecBox(boxCCusto, "S");
+						consulta.selectComboboxCentroCusto(boxCCusto, "S");
 					} else {
 						JOptionPane.showMessageDialog(null, "Favor preencher os campos obrigatórios!");
 					}
@@ -679,8 +602,12 @@ public class JanelaPrincipal {
 			}
 		});
 		
+		txtValor.addFocusListener(new java.awt.event.FocusAdapter() {
+			public void focusLost(java.awt.event.FocusEvent e) {
+				txtValor.setText(txtValor.getText().replace(",", "."));
+			}
+		});
 		
-
 		btnCancel.addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent arg0) {
 			}
@@ -708,7 +635,7 @@ public class JanelaPrincipal {
 		CrudCentroDeCusto crudCentroCusto = new CrudCentroDeCusto();
 		JDialog dialogCC = new JDialog();
 		JButton btnCcInc = new JButton("Incluir");
-		JButton btnCcAlt = new JButton("");
+		JButton btnCcAlt = new JButton("Alterar");
 		JButton btnCcExc = new JButton("Excluir");
 		modelCC = new DefaultTableModel();
 		tblTabCC = new JTable(modelCC);
@@ -852,7 +779,7 @@ public class JanelaPrincipal {
 						crudCentroCusto.selecCC(modelCC, tblTabCC);
 						boxGCCusto.removeAllItems();
 						boxGCCusto.addItem("Todos");
-						consulta.selecBox(boxGCCusto, "");						
+						consulta.selectComboboxCentroCusto(boxGCCusto, "");						
 					} catch (ParseException e1) {
 						JOptionPane.showMessageDialog(null, "Erro: " + e1.getMessage());
 					}
@@ -862,7 +789,7 @@ public class JanelaPrincipal {
 					dialogCC.dispose();					
 					boxGCCusto.removeAllItems();
 					boxGCCusto.addItem("Todos");
-					consulta.selecBox(boxGCCusto, "");
+					consulta.selectComboboxCentroCusto(boxGCCusto, "");
 					try {		
 						crudCentroCusto.selecCC(modelCC, tblTabCC);
 					} catch (ParseException e1) {
@@ -877,7 +804,7 @@ public class JanelaPrincipal {
 			    		dialogCC.dispose();			    		
 			    		boxGCCusto.removeAllItems();
 						boxGCCusto.addItem("Todos");
-						consulta.selecBox(boxGCCusto, "");
+						consulta.selectComboboxCentroCusto(boxGCCusto, "");
 			    		try {		
 			    			crudCentroCusto.selecCC(modelCC, tblTabCC);
 						} catch (ParseException e1) {
@@ -911,7 +838,7 @@ public class JanelaPrincipal {
 		//int resposta = JOptionPane.showConfirmDialog(null, "Recalcular Tudo", "Recalcular Tudo", JOptionPane.NO_OPTION);
 		Object[] options = { "Sim", "Não", "Cancelar" };
     	int resposta = JOptionPane.showOptionDialog(null, "Deseja recalcular tudo", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-    	System.out.println(resposta);
+    	
         if (resposta == 1) {
         	int indiceLinha = tblTab.getSelectedRow();			
 			if (indiceLinha != -1) {
@@ -923,325 +850,13 @@ public class JanelaPrincipal {
         }
         if (resposta == 0 || resposta == 1) {
         	dlgProgress.setVisible(true);
-            RecalculaSaldo rec = new RecalculaSaldo(progress, dlgProgress, lblStatus, lblSaldo, lblInvF, idReg, data);
+            RecalculaSaldo rec = new RecalculaSaldo(progress, dlgProgress, lblStatus, lblSaldo, lblInvF, lblInvV, idReg, data);
     		Thread t = new Thread(rec);
     		t.start();
         }
 	}
 
-	public void relatorios() {
-		JLabel lblERel = new JLabel("RELATÓRIOS");
-		JLabel lblEDe = new JLabel("De:");
-		JLabel lblEAte = new JLabel("Até:");
-		JDateChooser txtEDe = new JDateChooser(new Date(), "dd/MM/yyyy");
-		JDateChooser txtEAte = new JDateChooser(new Date(), "dd/MM/yyyy");
-		JRadioButton radExtrat = new JRadioButton("Extrato");
-		radExtrat.setContentAreaFilled(false);
-		JRadioButton radSeman = new JRadioButton("Gastos Detalhados");
-		radSeman.setContentAreaFilled(false);
-		ImageIcon iconGeraRel = new ImageIcon("imagens/geraRel.png");
-		JButton btnEGeraRel = new JButton(iconGeraRel);
-		btnEGeraRel.setContentAreaFilled(false);
-		btnEGeraRel.setBorderPainted(false);
-		btnEGeraRel.setToolTipText("Gerar Relatório");
-		JTextPane txtPER = new JTextPane();
-		JScrollPane sp = new JScrollPane(txtPER);
-		JPanel panelRel = new JPanel();
-		tabPane.addTab("Relatórios", null, panelRel, null);
-		panelRel.setLayout(null);
-		panelRel.setBackground(new Color(200, 200, 200));
-		lblERel.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 20));
-		txtPER.setEditable(false);
-		sp.setBounds(05, 90, 815, 415);
-		lblERel.setBounds(360, 0, 200, 30);
-		lblEDe.setBounds(05, 40, 80, 10);
-		lblEAte.setBounds(05, 70, 80, 10);
-		txtEDe.setBounds(40, 35, 90, 20);
-		txtEAte.setBounds(40, 65, 90, 20);
-		btnEGeraRel.setBounds(310, 53, 32, 32);
-		radExtrat.setBounds(150, 48, 140, 20);
-		radSeman.setBounds(150, 68, 140, 20);
-		panelRel.add(lblERel);
-		panelRel.add(lblEDe);
-		panelRel.add(lblEAte);
-		panelRel.add(radExtrat);
-		panelRel.add(radSeman);
-		panelRel.add(txtEDe);
-		panelRel.add(txtEAte);
-		panelRel.add(btnEGeraRel);
-		panelRel.add(sp);
-
-		radExtrat.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				radSeman.setSelected(false);
-			}
-		});
-		radSeman.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				radExtrat.setSelected(false);
-			}
-		});
-		
-		btnEGeraRel.addMouseListener(new MouseListener() {
-			public void mouseReleased(MouseEvent arg0) {
-			}
-
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			public void mouseExited(MouseEvent arg0) {
-				ImageIcon iconN = new ImageIcon("imagens/geraRelC.png");
-				btnEGeraRel.setIcon(iconN);
-			}
-
-			public void mouseEntered(MouseEvent arg0) {
-				ImageIcon iconN = new ImageIcon("imagens/brilho/geraRelC.png");
-				btnEGeraRel.setIcon(iconN);
-			}
-
-			public void mouseClicked(MouseEvent arg0) {
-
-				Relatorios rel = new Relatorios();
-				if (txtEDe.getDate() != null && txtEAte.getDate() != null) {
-					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-					String deN = df.format(txtEDe.getDate());
-					String ateN = df.format(txtEAte.getDate());
-					if (radSeman.isSelected()) {
-						Date data = new Date();
-						SimpleDateFormat formatador = new SimpleDateFormat("yyyy-MM-dd");
-						formatador.format(data);
-						int dia = Integer.parseInt(formatador.format(data).substring(8,10));
-						Pivot p = new Pivot();
-						p.criarTab(dia);
-						rel.relSemanal(deN, ateN, txtPER);
-					} else if (radExtrat.isSelected()) {
-						rel.extrato(deN, ateN, txtPER);
-					}
-				} else {
-					JOptionPane.showMessageDialog(null, "Favor preencher os campos Data!");
-				}
-			
-			}
-		});
-	}
-
-	public void graficos() {
-		panelGraf = new JPanel();
-		tabPane.addTab("Gráficos", null, panelGraf, null);
-		panelGraf.setLayout(null);
-		panelGraf.setBackground(new Color(200, 200, 200));
-		JLabel lblGRel = new JLabel("GRÁFICOS");
-		lblGRel.setFont(new Font("Arial Rounded MT Bold", Font.BOLD, 20));
-		JLabel lblGDe = new JLabel("De:");
-		JLabel lblGAte = new JLabel("Até:");
-		JDateChooser txtGDe = new JDateChooser(new Date(), "dd/MM/yyyy");
-		JDateChooser txtGAte = new JDateChooser(new Date(), "dd/MM/yyyy");
-		JRadioButton checSCC = new JRadioButton("Saídas CC");
-		checSCC.setContentAreaFilled(false);
-		JRadioButton checECC = new JRadioButton("Entradas CC");
-		checECC.setContentAreaFilled(false);
-		JRadioButton checM = new JRadioButton("Gastos Mensais");
-		JComboBox<String> boxCcG = new JComboBox<String>();
-		boxCcG.addItem("Todos");
-		consulta.selecBox(boxCcG, "");
-		boxCcG.setEnabled(false);
-		checM.setContentAreaFilled(false);
-		ImageIcon iconGeraGraf = new ImageIcon("imagens/grafico.png");
-		JButton btnGGeraGra = new JButton(iconGeraGraf);
-		btnGGeraGra.setContentAreaFilled(false);
-		btnGGeraGra.setBorderPainted(false);
-		btnGGeraGra.setToolTipText("Gerar Gráfico");
-		
-		ImageIcon iconEnvG = new ImageIcon("imagens/enviaG.png");
-		JButton btnEnviG = new JButton(iconEnvG);
-		btnEnviG.setContentAreaFilled(false);
-		btnEnviG.setBorderPainted(false);
-		btnEnviG.setToolTipText("Envia Gráficos em PDF");
-		
-		JLabel lblGrafGM = new JLabel();
-		JLabel lblGrafE = new JLabel();
-		JLabel lblGrafGCC = new JLabel();
-		
-		
-		
-		btnGGeraGra.setBounds(500, 60, 32, 32);
-		
-		lblGRel.setBounds(360, 0, 200, 30);
-		lblGDe.setBounds(05, 40, 80, 10);
-		lblGAte.setBounds(05, 70, 80, 10);
-		txtGDe.setBounds(40, 35, 90, 20);
-		txtGAte.setBounds(40, 65, 90, 20);
-		checSCC.setBounds(150, 28, 140, 20);
-		checECC.setBounds(150, 48, 140, 20);
-		checM.setBounds(150, 68, 140, 20);
-		boxCcG.setBounds(270, 68, 220, 20);
-		lblGrafGM.setBounds(05, 100, 815, 410);
-		lblGrafE.setBounds(05, 100, 500, 410);
-		lblGrafGCC.setBounds(05, 400, 815, 410);
-		btnEnviG.setBounds(787, 05, 32, 32);
-		panelGraf.add(lblGRel);
-		panelGraf.add(lblGDe);
-		panelGraf.add(lblGAte);
-		panelGraf.add(txtGDe);
-		panelGraf.add(txtGAte);
-		panelGraf.add(checSCC);
-		panelGraf.add(checECC);
-		panelGraf.add(checM);
-		panelGraf.add(boxCcG);
-		panelGraf.add(btnGGeraGra);
-		panelGraf.add(lblGrafE);
-		panelGraf.add(lblGrafGCC);
-		panelGraf.add(lblGrafGM);
-		panelGraf.add(btnEnviG);
-
-		checSCC.setSelected(true);
-		lblGrafGM.setIcon(carregaImg("scc"));
-		checSCC.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checECC.setSelected(false);
-				checM.setSelected(false);
-				lblGrafGM.setIcon(carregaImg("scc"));
-				boxCcG.setEnabled(false);
-			}
-		});
-		checECC.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checSCC.setSelected(false);
-				checM.setSelected(false);
-				lblGrafGM.setIcon(carregaImg("ecc"));
-				boxCcG.setEnabled(false);
-			}
-		});
-		checM.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				checECC.setSelected(false);
-				checSCC.setSelected(false);
-				lblGrafGM.setIcon(carregaImg("m"));
-				boxCcG.setEnabled(true);
-			}
-		});		
-		
-		btnGGeraGra.addMouseListener(new MouseListener() {
-			public void mouseReleased(MouseEvent arg0) {
-			}
-
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			public void mouseExited(MouseEvent arg0) {
-				ImageIcon iconN = new ImageIcon("imagens/graficoC.png");
-				btnGGeraGra.setIcon(iconN);
-			}
-
-			public void mouseEntered(MouseEvent arg0) {
-				ImageIcon iconN = new ImageIcon("imagens/brilho/graficoC.png");
-				btnGGeraGra.setIcon(iconN);
-			}			
-
-			public void mouseClicked(MouseEvent arg0) {
-				if (txtGDe.getDate() != null && txtGAte.getDate() != null) {
-					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-					String deN = df.format(txtGDe.getDate());
-					String ateN = df.format(txtGAte.getDate());
-					GeraGraficos graficos = new GeraGraficos();
-					if (checSCC.isSelected() || checECC.isSelected() || checM.isSelected()) {
-						if (checSCC.isSelected()) {
-							try {
-								graficos.gastosCC(deN, ateN,0);
-								lblGrafGM.setIcon(carregaImg("scc"));
-							} catch (Exception e) {
-							}
-
-						} else if (checECC.isSelected()) {
-							try {
-								graficos.entradaCC(deN, ateN,0);
-								lblGrafGM.setIcon(carregaImg("ecc"));
-							} catch (Exception e) {
-							}
-
-						} else if (checM.isSelected()) {
-							try {
-								graficos.gastosMens(deN, ateN, boxCcG,0);
-								lblGrafGM.setIcon(carregaImg("m"));
-							} catch (Exception e) {
-							}
-						}
-					} else {
-						JOptionPane.showMessageDialog(null, "Selecione um tipo de Gráfico!");
-					}
-
-				} else {
-					JOptionPane.showMessageDialog(null, "Favor preencher os campos Data!");
-				}
-			}
-		});
-		
-		btnEnviG.addMouseListener(new MouseListener() {
-			
-			@Override
-			public void mouseReleased(MouseEvent e) {				
-			}
-			
-			@Override
-			public void mousePressed(MouseEvent e) {				
-			}
-			
-			@Override
-			public void mouseExited(MouseEvent e) {
-				ImageIcon iconN = new ImageIcon("imagens/enviaG.png");
-				btnEnviG.setIcon(iconN);
-			}
-			
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				ImageIcon iconN = new ImageIcon("imagens/brilho/enviaGC.png");
-				btnEnviG.setIcon(iconN);				
-			}
-			
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				new GraficosPdf();
-			}
-		});
-	}
 	
-	public ImageIcon carregaImg(String opc) {
-		ImageIcon icon = null;
-		BufferedImage imgGCC = null;
-		BufferedImage imgECC = null;
-		BufferedImage imgGM = null;
-		try {
-			if (opc == "scc") {
-				imgECC = ImageIO.read(new File("imagens/graficos/grafico_scc.PNG"));
-				ImageIcon icoGCC = new ImageIcon(imgECC);
-				icon = icoGCC;
-			} else if (opc == "ecc") {
-				imgGCC = ImageIO.read(new File("imagens/graficos/grafico_ecc.PNG"));
-				ImageIcon icoECC = new ImageIcon(imgGCC);
-				icon = icoECC;
-			} else if (opc == "m") {
-				imgGM = ImageIO.read(new File("imagens/graficos/grafico_m.PNG"));
-				ImageIcon icoGM = new ImageIcon(imgGM);
-				icon = icoGM;
-			}
-
-		} catch (Exception e) {
-		}
-
-		return icon;
-	}
-
-	public void abrirPlan() {
-		try {
-			Desktop.getDesktop().open(new File("arquivos/planilhas/GESTÃO FINANCEIRA.xlsm"));
-		} catch (IOException e) {
-		}
-	}
 
 	public static void main(String[] args) {
 		new JanelaPrincipal().janela.setVisible(true);

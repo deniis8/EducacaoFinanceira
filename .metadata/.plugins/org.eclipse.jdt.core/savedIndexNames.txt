@@ -1,0 +1,4 @@
+INDEX VERSION 1.131+C:\EducacaoFinanceira\.metadata\.plugins\org.eclipse.jdt.core
+1865797976.index
+735705145.index
+4258760852.index

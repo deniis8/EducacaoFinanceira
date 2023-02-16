@@ -3,11 +3,13 @@ package configuracao.banco.dados;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
+
 import javax.swing.JOptionPane;
 
 public class ConexaoBancoDadosSQLite {
 
-    private static Connection con = null;
+    /*private static Connection con = null;
 
     public Connection getConexao() {
         return con;
@@ -33,9 +35,42 @@ public class ConexaoBancoDadosSQLite {
         } catch (SQLException e) {
             //System.out.println("Erro ao fechar a conexão | Erro: " + e.getMessage());
         }
-    }/*
-    public static void main(String[] args) {
-		Conexao conexao = new Conexao();
-		conexao.abrir();
-	}*/
+    }*/
+	
+	
+	//===================================================
+	// Conexão com MariaDB
+	//===================================================
+	public String userName, password, url, driver;
+	public Connection con;
+	public Statement st;
+	
+	public Connection getConexao() {
+        return con;
+    }
+
+	public Connection abrir() {
+		userName = "root";
+		password = "1204";
+		url = "jdbc:mariadb://localhost:3307/GestaoFinanceira";
+		driver = "org.mariadb.jdbc.Driver";
+		try {
+			Class.forName(driver);
+			con = DriverManager.getConnection(url, userName, password);
+			st = con.createStatement();
+			//System.out.println("Conexão realizada com sucesso");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return con;
+	}
+	
+	public void fechar() {
+        try {
+            con.close();
+            //System.out.println("Conexão fechada..."); 
+        } catch (SQLException e) {
+            //System.out.println("Erro ao fechar a conexão | Erro: " + e.getMessage());
+        }
+    }
 }
