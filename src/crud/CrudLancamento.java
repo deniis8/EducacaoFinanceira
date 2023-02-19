@@ -9,13 +9,13 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
 
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 import interfaces.CrudLancamentos;
 import mascaras.Mascaras;
 
 public class CrudLancamento implements CrudLancamentos{
 
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	private PreparedStatement pst;
 	private int idLan = 0;
 	

@@ -30,7 +30,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 import consultas.Consultas;
 import crud.CrudCentroDeCusto;
 import crud.CrudLancamento;

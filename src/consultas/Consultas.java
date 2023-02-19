@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 
 /**
  *
@@ -34,7 +34,7 @@ public class Consultas {
 	private double totalAR;
 	private double totalR;
 	DecimalFormat dFN = new DecimalFormat("0.00");
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	PreparedStatement pst;
 
 	public void selectLanca(DefaultTableModel modTabLanc, JTable table, JLabel lblTotalAP, JLabel lblTotalP, JLabel lblTotalAR, JLabel lblTotalR) throws ParseException {

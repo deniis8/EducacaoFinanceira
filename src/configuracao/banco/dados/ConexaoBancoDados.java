@@ -7,7 +7,7 @@ import java.sql.Statement;
 
 import javax.swing.JOptionPane;
 
-public class ConexaoBancoDadosSQLite {
+public class ConexaoBancoDados {
 
     /*
     

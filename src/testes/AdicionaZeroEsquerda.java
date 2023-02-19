@@ -6,15 +6,15 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 
-public class TESTE {
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+public class AdicionaZeroEsquerda {
+	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	PreparedStatement pst;
 	PreparedStatement pst2;
 	public static void main(String[] args) {
 		
-		TESTE teste = new TESTE();
+		AdicionaZeroEsquerda teste = new AdicionaZeroEsquerda();
 		//teste.atualizaTabLan();
 		teste.atualizaTabSald();
 		System.out.println("Fim");

@@ -8,12 +8,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 import interfaces.CrudCentroCusto;
 
 public class CrudCentroDeCusto implements CrudCentroCusto{
 	
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	PreparedStatement pst;
 	
 	public void selecCC(DefaultTableModel modTabLanc, JTable table) throws ParseException {		

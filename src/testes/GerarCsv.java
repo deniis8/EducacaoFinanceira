@@ -6,9 +6,11 @@ import java.io.PrintWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import configuracao.banco.dados.ConexaoBancoDados;
+
 public class GerarCsv {
 	
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	PreparedStatement pst;
 	
 	public void exec(){
@@ -17,13 +19,12 @@ public class GerarCsv {
         	
         	String slqUlt = " SELECT ";
         	slqUlt +="    ID_LANC, "; 
-        	slqUlt +="    DATA, "; 
-        	slqUlt +="    HORA, "; 
+        	slqUlt +="    DATA_HORA, "; 
         	slqUlt +="    VALOR, "; 
         	slqUlt +="    DESCRICAO, "; 
         	slqUlt +="    ID_CCUSTO, ";
         	//slqUlt +="    (SELECT DESCRI FROM CCUSTO AS CC WHERE LAN.ID_CCUSTO=CC.ID_CCUSTO AND D_E_L_E_T_ <>'*') AS CC_DESCRI, ";
-        	slqUlt +="    STATUS, "; 
+        	slqUlt +="    STATUS_LANC, "; 
         	slqUlt +="    D_E_L_E_T_ "; 
         	slqUlt +=" FROM "; 
         	slqUlt +="     LANCAMENTOS AS LAN "; 
@@ -37,7 +38,9 @@ public class GerarCsv {
     			while(rs.next()) {
     				sb.append(Integer.parseInt(rs.getString(1)));
     				sb.append(';');
-    				sb.append(rs.getString(2) + " " + rs.getString(3));
+    				sb.append(rs.getString(2));
+    				sb.append(';');
+    				sb.append(rs.getString(3));
     				sb.append(';');
     				sb.append(rs.getString(4));
     				sb.append(';');
@@ -45,9 +48,7 @@ public class GerarCsv {
     				sb.append(';');
     				sb.append(rs.getString(6));
     				sb.append(';');
-    				sb.append(rs.getString(7));
-    				sb.append(';');
-    				sb.append(rs.getString(2) + " " + rs.getString(3));
+    				sb.append(rs.getString(2));
     				sb.append(";");
     				sb.append("1");
     				sb.append(";");
@@ -73,13 +74,12 @@ public class GerarCsv {
         	
         	String slqUlt = " SELECT ";
         	slqUlt +="    ID_SALDO, "; 
-        	slqUlt +="    DATA, "; 
-        	slqUlt +="    HORA, "; 
+        	slqUlt +="    DATA_HORA, "; 
         	slqUlt +="    VALORLAN, "; 
         	slqUlt +="    DESCRILAN, "; 
         	slqUlt +="    SALDO, ";
         	slqUlt +="    CCUSTO, ";
-        	slqUlt +="    STATUS "; 
+        	slqUlt +="    STATUS_LANC "; 
         	slqUlt +=" FROM "; 
         	slqUlt +="     SALDOS "; 
 
@@ -90,7 +90,9 @@ public class GerarCsv {
     			while(rs.next()) {
     				sb.append(Integer.parseInt(rs.getString(1)));
     				sb.append(';');
-    				sb.append(rs.getString(2) + " " + rs.getString(3));
+    				sb.append(rs.getString(2));
+    				sb.append(';');
+    				sb.append(rs.getString(3));
     				sb.append(';');
     				sb.append(rs.getString(4));
     				sb.append(';');
@@ -99,8 +101,6 @@ public class GerarCsv {
     				sb.append(rs.getString(6));
     				sb.append(';');
     				sb.append(rs.getString(7));
-    				sb.append(';');
-    				sb.append(rs.getString(8));
     				sb.append(';');
     				sb.append("");
     				sb.append(';');

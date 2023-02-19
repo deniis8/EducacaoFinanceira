@@ -10,7 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 import consultas.Consultas;
 
 /**
@@ -19,7 +19,7 @@ import consultas.Consultas;
  */
 public class RecalculaSaldo implements Runnable {
 
-    ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+    ConexaoBancoDados conexao = new ConexaoBancoDados();
     Consultas consulta = new Consultas();
     PreparedStatement pst;
     JProgressBar pB;
