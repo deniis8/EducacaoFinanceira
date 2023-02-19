@@ -105,11 +105,9 @@ public class CrudLancamento implements CrudLancamentos{
 			pst.executeUpdate();
 			
 			ResultSet rs = pst.getGeneratedKeys();
-			int id = 0;
 			if(rs.next()){
 				idLan = rs.getInt(1);
 			}		
-			System.out.println("Id gerado pelo insert foi " + idLan);	
 			
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());

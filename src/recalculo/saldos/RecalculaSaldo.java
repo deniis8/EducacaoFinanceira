@@ -10,9 +10,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
-
-import org.apache.commons.lang3.StringUtils;
-
 import configuracao.banco.dados.ConexaoBancoDadosSQLite;
 import consultas.Consultas;
 

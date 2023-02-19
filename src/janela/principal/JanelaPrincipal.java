@@ -4,12 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -583,9 +579,10 @@ public class JanelaPrincipal {
 					consulta.selectInvF(lblInvF);
 					consulta.selectInvV(lblInvV);
 					dialogP.dispose();
-				} else if (opc == "ex") {
-					int resposta = JOptionPane.showConfirmDialog(null, "Deseja realmente excluir esse Lançamento",
-							"Deseja Lançamento", JOptionPane.YES_NO_OPTION);
+				} else if (opc == "ex") {					
+					Object[] options = { "Sim", "Não", "Cancelar" };
+			    	int resposta = JOptionPane.showOptionDialog(null, "Deseja excluir esse Lançamento?", "Pergunta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+					
 					if (resposta == JOptionPane.YES_OPTION) {
 						crudLancamento.excluirLancamento(txtCod.getText());
 						try {
@@ -798,7 +795,7 @@ public class JanelaPrincipal {
 					
 				}else {
 					Object[] options = { "Sim", "Não", "Cancelar" };
-			    	int resposta = JOptionPane.showOptionDialog(null, "Tem certeza que deseja excluir esse registro", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+			    	int resposta = JOptionPane.showOptionDialog(null, "Deseja excluir esse registro?", "Pergunta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 			    	if(resposta==0) {
 			    		crudCentroCusto.excluirCentroCusto(Integer.parseInt(cod));
 			    		dialogCC.dispose();			    		
@@ -837,7 +834,7 @@ public class JanelaPrincipal {
 		String data = "";
 		//int resposta = JOptionPane.showConfirmDialog(null, "Recalcular Tudo", "Recalcular Tudo", JOptionPane.NO_OPTION);
 		Object[] options = { "Sim", "Não", "Cancelar" };
-    	int resposta = JOptionPane.showOptionDialog(null, "Deseja recalcular tudo", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+    	int resposta = JOptionPane.showOptionDialog(null, "Deseja recalcular tudo?", "Informação", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
     	
         if (resposta == 1) {
         	int indiceLinha = tblTab.getSelectedRow();			

@@ -9,7 +9,12 @@ import javax.swing.JOptionPane;
 
 public class ConexaoBancoDadosSQLite {
 
-    /*private static Connection con = null;
+    /*
+    
+    //===================================================
+	// Conexão com MariaDB
+	//===================================================
+    private static Connection con = null;
 
     public Connection getConexao() {
         return con;
