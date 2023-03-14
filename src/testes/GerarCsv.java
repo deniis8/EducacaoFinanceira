@@ -14,18 +14,16 @@ public class GerarCsv {
 	PreparedStatement pst;
 	
 	public void exec(){
-        try (PrintWriter writer = new PrintWriter(new File("arquivos/baseLancamentos.txt"))) {
+        try (PrintWriter writer = new PrintWriter(new File("arquivos/lancamentos.csv"))) {
         	StringBuilder sb = new StringBuilder();
         	
         	String slqUlt = " SELECT ";
-        	slqUlt +="    ID_LANC, "; 
-        	slqUlt +="    DATA_HORA, "; 
+        	slqUlt +="    STR_TO_DATE(DATA_HORA, '%Y-%m-%d'), "; 
+        	slqUlt +="    TIME(DATA_HORA), "; 
         	slqUlt +="    VALOR, "; 
         	slqUlt +="    DESCRICAO, "; 
-        	slqUlt +="    ID_CCUSTO, ";
-        	//slqUlt +="    (SELECT DESCRI FROM CCUSTO AS CC WHERE LAN.ID_CCUSTO=CC.ID_CCUSTO AND D_E_L_E_T_ <>'*') AS CC_DESCRI, ";
-        	slqUlt +="    STATUS_LANC, "; 
-        	slqUlt +="    D_E_L_E_T_ "; 
+        	slqUlt +="    (SELECT DESCRI FROM CCUSTO AS CC WHERE CC.ID_CCUSTO=LAN.ID_CCUSTO AND CC.D_E_L_E_T_<>'*') AS CCUSTO,";
+        	slqUlt +="    STATUS_LANC ";
         	slqUlt +=" FROM "; 
         	slqUlt +="     LANCAMENTOS AS LAN "; 
         	slqUlt +=" WHERE ";
@@ -35,25 +33,21 @@ public class GerarCsv {
     		try {
     			pst = conexao.getConexao().prepareStatement(slqUlt);
     			ResultSet rs = pst.executeQuery();
+    			sb.append("Data;Hora;ValorGasto;Descricao;CentroCusto;Status");
+    			sb.append('\n');
     			while(rs.next()) {
-    				sb.append(Integer.parseInt(rs.getString(1)));
+    				sb.append(rs.getString(1));
     				sb.append(';');
     				sb.append(rs.getString(2));
     				sb.append(';');
-    				sb.append(rs.getString(3));
+    				sb.append(rs.getString(3).replace(".", ","));
     				sb.append(';');
     				sb.append(rs.getString(4));
     				sb.append(';');
     				sb.append(rs.getString(5));
     				sb.append(';');
     				sb.append(rs.getString(6));
-    				sb.append(';');
-    				sb.append(rs.getString(2));
-    				sb.append(";");
-    				sb.append("1");
-    				sb.append(";");
-    				sb.append(" ");
-    				sb.append(";;");
+    				sb.append('\n');
     			}
     		} catch (Exception e) {
     		}
@@ -61,7 +55,7 @@ public class GerarCsv {
 
             writer.write(sb.toString());
             writer.close();
-            System.out.println("Arquivo .txt gerado com sucesso!");
+            System.out.println("Arquivo .csv gerado com sucesso!");
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -69,43 +63,39 @@ public class GerarCsv {
     }
 	
 	public void saldos(){
-        try (PrintWriter writer = new PrintWriter(new File("arquivos/baseSaldos.txt"))) {
+        try (PrintWriter writer = new PrintWriter(new File("arquivos/saldos.csv"))) {
         	StringBuilder sb = new StringBuilder();
         	
         	String slqUlt = " SELECT ";
-        	slqUlt +="    ID_SALDO, "; 
-        	slqUlt +="    DATA_HORA, "; 
+        	slqUlt +="    STR_TO_DATE(DATA_HORA, '%Y-%m-%d'), "; 
+        	slqUlt +="    TIME(DATA_HORA), "; 
         	slqUlt +="    VALORLAN, "; 
         	slqUlt +="    DESCRILAN, "; 
-        	slqUlt +="    SALDO, ";
-        	slqUlt +="    CCUSTO, ";
-        	slqUlt +="    STATUS_LANC "; 
+        	slqUlt +="    STATUS_LANC, ";
+        	slqUlt +="    SALDO "; 
         	slqUlt +=" FROM "; 
         	slqUlt +="     SALDOS "; 
+        	slqUlt +=" ORDER BY ";  
+        	slqUlt +="	   DATA_HORA DESC LIMIT 1 "; 
 
     		conexao.abrir(); 
     		try {
     			pst = conexao.getConexao().prepareStatement(slqUlt);
     			ResultSet rs = pst.executeQuery();
+    			sb.append("Data;Hora;ValorLancamento;Descricao;Status;Saldo");
+    			sb.append('\n');
     			while(rs.next()) {
-    				sb.append(Integer.parseInt(rs.getString(1)));
+    				sb.append(rs.getString(1));
     				sb.append(';');
     				sb.append(rs.getString(2));
     				sb.append(';');
-    				sb.append(rs.getString(3));
+    				sb.append(rs.getString(3).replace(".", ","));
     				sb.append(';');
     				sb.append(rs.getString(4));
     				sb.append(';');
     				sb.append(rs.getString(5));
     				sb.append(';');
-    				sb.append(rs.getString(6));
-    				sb.append(';');
-    				sb.append(rs.getString(7));
-    				sb.append(';');
-    				sb.append("");
-    				sb.append(';');
-    				sb.append(1);
-    				sb.append(";;");
+    				sb.append(rs.getString(6).replace(".", ","));
     			}
     		} catch (Exception e) {
     		}
@@ -113,13 +103,13 @@ public class GerarCsv {
 
             writer.write(sb.toString());
             writer.close();
-            System.out.println("Arquivo .txt gerado com sucesso!");
+            System.out.println("Arquivo .csv gerado com sucesso!");
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
-	
+	/*
 	public void centroCusto(){
         try (PrintWriter writer = new PrintWriter(new File("arquivos/baseCCusto.txt"))) {
         	StringBuilder sb = new StringBuilder();
@@ -153,12 +143,12 @@ public class GerarCsv {
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
-    }
+    }*/
     
     public static void main(String[] args) {
 		GerarCsv gs = new GerarCsv();
 		gs.exec();
-		gs.centroCusto();
+		//gs.centroCusto();
 		gs.saldos();
 	}
 
