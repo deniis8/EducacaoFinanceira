@@ -1,8 +1,8 @@
 -- Cria a base de dados
-CREATE DATABASE GestaoFinanceira; 
+CREATE DATABASE GestaoFinanceira_Dev; 
 
 -- Coloca em uso a base de dados
-USE GestaoFinanceira; 
+USE GestaoFinanceira_Dev; 
 
 -- Deleta a tabela
 
@@ -25,13 +25,22 @@ INTO TABLE LANCAMENTOS character set latin1
 FIELDS TERMINATED BY ';' LINES TERMINATED BY ';;';
 
 -- Seleciona os registros
-SELECT * FROM lancamentos;
+SELECT 
+                                            DATA_HORA,
+                                            VALORLAN,
+                                            DESCRILAN,
+                                            STATUS_LANC,
+                                            SALDO
+                                        FROM 
+                                            SALDOS AS SALDO 
+                                        ORDER BY 
+                                            DATA_HORA DESC LIMIT 1
 
 -- View Lancamentos
 CREATE VIEW VW_LANCAMENTOS AS
 SELECT 
     LANC.ID_LANC AS ID, 
-    LANC.DATA_HORA AS DATA_HORA, 
+    STR_TO_DATE(LANC.DATA_HORA, '%Y-%m-%d') AS DATA_HORA, 
     CASE DAYOFWEEK(DATA_HORA) 
     	  WHEN '1' THEN 'Domingo' 
         WHEN '2' THEN 'Segunda-Feira' 
@@ -104,7 +113,7 @@ D_E_L_E_T_ CHAR(1) NOT NULL
 );
 
 INSERT INTO USUARIOS(NOME_COMPLETO, EMAIL, SENHA, D_E_L_E_T_) 
-VALUES('Adenilson Soares da Silva', 'adenilson_denis8@hotmail.com', 'TESTE', '')
+VALUES('Adenilson Soares da Silva', 'adenilson_denis8@hotmail.com', 'TESTE', '');
 
 /*
 INSERT INTO USUARIOS(NOME_COMPLETO, EMAIL, SENHA, D_E_L_E_T_) 
@@ -112,4 +121,23 @@ VALUES('Adenilson Soares da Silva', 'adenilson_denis8@hotmail.com', CONVERT(VARB
 */
 
 -- SELECT pwdcompare('Asvezesfalo8', SENHA), * FROM USUARIOS;
-SELECT * FROM USUARIOS;
+SELECT * FROM usuarios;
+
+-- Backup e Restore
+-- Execute os comandos no prompt (dieretório: C:\Program Files\MariaDB 10.6\bin)
+mysqldump -u root -p gestaofinanceira > C:\EducacaoFinanceira\backup\backup.sql
+mysql -u root -p gestaofinanceira_dev < C:\EducacaoFinanceira\backup\backup.sql
+
+-- PROCEDURE 
+DELIMITER $$
+
+CREATE PROCEDURE ATUALIZA_SALDOS (IN DATA_REGISTRO DATETIME) 
+BEGIN
+DELETE FROM saldos WHERE DATA_HORA >= DATE(DATA_REGISTRO);
+SELECT * FROM lancamentos WHERE DATA_HORA>=DATA_REGISTRO AND D_E_L_E_T_<>'*';
+SELECT * FROM saldos ORDER BY DATA_HORA DESC LIMIT 1;
+END $$
+
+DELIMITER;
+
+CALL ATUALIZA_SALDOS('2023-03-19 21:20:00')
