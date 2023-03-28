@@ -16,6 +16,8 @@ import consultas.Consultas;
 /**
  *
  * @author adenilson.soares
+ * Essa classe deixou de ser usada, o recalculo passou a ser realizado pela 
+ * procedure ATUALIZA_SALDOS
  */
 public class RecalculaSaldo implements Runnable {
 
@@ -86,7 +88,7 @@ public class RecalculaSaldo implements Runnable {
         }
         sql += "     LAN.D_E_L_E_T_<>'*' AND CC.D_E_L_E_T_<>'*' \n";
         sql += " ORDER BY \n";
-        sql += "	 LAN.DATA_HORA ";  
+        sql += "	 LAN.DATA_HORA, LAN.DATA_CRIACAO ";  
         
         String sqlDel="";
         if(idReg=="") {

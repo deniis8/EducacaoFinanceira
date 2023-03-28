@@ -113,7 +113,7 @@ public class CrudLancamento implements CrudLancamentos{
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
 		conexao.fechar();
-		insereSaldo(data, hora, valor, descri, status, boxCC, idLan);
+		//insereSaldo(data, hora, valor, descri, status, boxCC, idLan);
 		
 	}
 	

@@ -50,8 +50,8 @@ public class JanelaPrincipal {
 	private JMenu menu;
 	private JMenuItem itemAtuali;
 	private JMenuItem itemSair;
-	private JMenu menuRec;
-	private JMenuItem itemRec;
+	//private JMenu menuRec;
+	//private JMenuItem itemRec;
 	private JMenu menuCC;
 	private JMenuItem itemCC;
 	private JLabel lblDe;
@@ -140,8 +140,8 @@ public class JanelaPrincipal {
 		menu = new JMenu("Menu");
 		itemAtuali = new JMenuItem("Atualizar");
 		itemSair = new JMenuItem("Sair");
-		menuRec = new JMenu("Recalculo");
-		itemRec = new JMenuItem("Recalcular Saldo");
+		//menuRec = new JMenu("Recalculo");
+		//itemRec = new JMenuItem("Recalcular Saldo");
 		
 		menuCC = new JMenu("Centro de Custo");
 		itemCC = new JMenuItem("Cadastro");
@@ -237,12 +237,12 @@ public class JanelaPrincipal {
 			}
 		});
 
-		itemRec.addActionListener(new ActionListener() {
+		/*itemRec.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				rodarThred();
 			}
-		});
+		});*/
 		
 		itemCC.addActionListener(new ActionListener() {
 			@Override
@@ -399,10 +399,10 @@ public class JanelaPrincipal {
 	public void menu() {
 		menu.add(itemAtuali);
 		menu.add(itemSair);
-		menuRec.add(itemRec);
+		//menuRec.add(itemRec);
 		menuCC.add(itemCC);
 		menuBar.add(menu);
-		menuBar.add(menuRec);
+		//menuBar.add(menuRec);
 		menuBar.add(menuCC);
 		janela.setJMenuBar(menuBar);
 
@@ -816,7 +816,7 @@ public class JanelaPrincipal {
 		
 	}
 
-	public void rodarThred() {
+	/*public void rodarThred() {
 		JDialog dlgProgress = new JDialog();
 		dlgProgress.setTitle("Calculando...");
 		JLabel lblStatus = new JLabel("Calculando...");
@@ -851,7 +851,7 @@ public class JanelaPrincipal {
     		Thread t = new Thread(rec);
     		t.start();
         }
-	}
+	}*/
 
 	
 
