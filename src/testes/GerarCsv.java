@@ -13,7 +13,7 @@ public class GerarCsv {
 	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	PreparedStatement pst;
 	
-	public void exec(){
+	public void lancamentos(){
         try (PrintWriter writer = new PrintWriter(new File("arquivos/lancamentos.csv"))) {
         	StringBuilder sb = new StringBuilder();
         	
@@ -55,7 +55,7 @@ public class GerarCsv {
 
             writer.write(sb.toString());
             writer.close();
-            System.out.println("Arquivo .csv gerado com sucesso!");
+            System.out.println("Arquivo lancamentos.csv gerado com sucesso!");
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -103,34 +103,44 @@ public class GerarCsv {
 
             writer.write(sb.toString());
             writer.close();
-            System.out.println("Arquivo .csv gerado com sucesso!");
+            System.out.println("Arquivo saldos.csv gerado com sucesso!");
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
-	/*
-	public void centroCusto(){
-        try (PrintWriter writer = new PrintWriter(new File("arquivos/baseCCusto.txt"))) {
+	public void gastosMensais(){
+        try (PrintWriter writer = new PrintWriter(new File("arquivos/gastoMensal.csv"))) {
         	StringBuilder sb = new StringBuilder();
-        	
-        	String slqUlt = " SELECT ID_CCUSTO, DESCRI FROM CCUSTO WHERE D_E_L_E_T_ <>'*'";
+
+        	String sqlConsultaGastosMensais = " SELECT ";
+        	sqlConsultaGastosMensais += " 	SUM(VALOR) AS VALOR_GASTO_MES, ";
+        	sqlConsultaGastosMensais += " 	DATA_HORA AS ANO, ";
+        	sqlConsultaGastosMensais += " 	MONTHNAME(DATA_HORA) AS MES ";
+        	sqlConsultaGastosMensais += " FROM ";
+        	sqlConsultaGastosMensais += " 	LANCAMENTOS ";
+        	sqlConsultaGastosMensais += " WHERE ";
+        	sqlConsultaGastosMensais += " 	STATUS_LANC='Pago' AND ID_CCUSTO NOT IN(19) AND D_E_L_E_T_<>'*' ";
+        	sqlConsultaGastosMensais += " GROUP BY ";
+        	sqlConsultaGastosMensais += " 	YEAR(DATA_HORA), MONTHNAME(DATA_HORA) ";
+        	sqlConsultaGastosMensais += " ORDER BY ";
+        	sqlConsultaGastosMensais += " 	DATA_HORA ";
+        		
+
 
     		conexao.abrir(); 
     		try {
-    			pst = conexao.getConexao().prepareStatement(slqUlt);
+    			pst = conexao.getConexao().prepareStatement(sqlConsultaGastosMensais);
     			ResultSet rs = pst.executeQuery();
+    			sb.append("ValorGastoMes;Ano;Mes");
+    			sb.append('\n');
     			while(rs.next()) {
-    				sb.append(Integer.parseInt(rs.getString(1)));
+    				sb.append(rs.getString(1).replace(".", ","));
     				sb.append(';');
     				sb.append(rs.getString(2));
     				sb.append(';');
-    				sb.append("2022-10-17 20:58:00");
-    				sb.append(';');
-    				sb.append("1");
-    				sb.append(';');
-    				sb.append(" ");
-    				sb.append(";;");
+    				sb.append(rs.getString(3));
+    				sb.append('\n');
     			}
     		} catch (Exception e) {
     		}
@@ -138,18 +148,18 @@ public class GerarCsv {
 
             writer.write(sb.toString());
             writer.close();
-            System.out.println("Arquivo .txt gerado com sucesso!");
+            System.out.println("Arquivo gastoMensal.csv gerado com sucesso!");
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
-    }*/
+    }
     
     public static void main(String[] args) {
 		GerarCsv gs = new GerarCsv();
-		gs.exec();
-		//gs.centroCusto();
+		gs.lancamentos();
 		gs.saldos();
+		gs.gastosMensais();
 	}
 
 }

@@ -117,7 +117,7 @@ public class CrudLancamento implements CrudLancamentos{
 		
 	}
 	
-    public void insereSaldo(String data, String hora, double valorLan, String descriLan, String status, JComboBox<String> ccusto, int idLan) {
+    /*public void insereSaldo(String data, String hora, double valorLan, String descriLan, String status, JComboBox<String> ccusto, int idLan) {
         DecimalFormat df = new DecimalFormat("0.00");
         String sqlSaldoF = "SELECT SALDO FROM SALDOS ORDER BY ID_SALDO DESC LIMIT 1";
         double saldoF = 0;
@@ -164,7 +164,7 @@ public class CrudLancamento implements CrudLancamentos{
         }
         conexao.fechar();
         
-    }
+    }*/
 	
     @Override
 	public void excluirLancamento(String cod) {
