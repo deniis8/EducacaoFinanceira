@@ -5,8 +5,9 @@ CREATE DATABASE GestaoFinanceira_Dev;
 USE GestaoFinanceira_Dev; 
 
 -- Deleta a tabela
-
+-- ===================================================================================================================
 -- Cria a tabela
+-- ===================================================================================================================
 CREATE TABLE lancamentos(
 ID_LANC INT AUTO_INCREMENT PRIMARY KEY,
 DATA_HORA DATETIME NOT NULL,
@@ -18,25 +19,19 @@ DATA_CRIACAO DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ID_USUARIO INT NOT NULL,
 D_E_L_E_T_ VARCHAR(1) NOT NULL
 );
+-- ===================================================================================================================
 
+-- ===================================================================================================================
 -- Insere registros a partir de um arquivo .txt
+-- ===================================================================================================================
 LOAD DATA LOCAL INFILE 'C:/Users/adeni/workspace/java/Teste/arquivos/baseLancamentos.txt'
 INTO TABLE LANCAMENTOS character set latin1
 FIELDS TERMINATED BY ';' LINES TERMINATED BY ';;';
+-- ===================================================================================================================
 
--- Seleciona os registros
-SELECT 
-                                            DATA_HORA,
-                                            VALORLAN,
-                                            DESCRILAN,
-                                            STATUS_LANC,
-                                            SALDO
-                                        FROM 
-                                            SALDOS AS SALDO 
-                                        ORDER BY 
-                                            DATA_HORA DESC LIMIT 1
-
+-- ===================================================================================================================
 -- View Lancamentos
+-- ===================================================================================================================
 CREATE VIEW VW_LANCAMENTOS AS
 SELECT 
     LANC.ID_LANC AS ID, 
@@ -61,11 +56,11 @@ WHERE
     LANC.D_E_L_E_T_ <> '*' 
 ORDER BY 
     LANC.DATA_HORA;
-    
-SELECT * FROM lancamentos WHERE ID_CCUSTO=60
-SELECT * FROM CCUSTO WHERE D_E_L_E_T_='*'
+-- ===================================================================================================================
 
+-- ===================================================================================================================
 -- Criação da tabela Saldos
+-- ===================================================================================================================
 CREATE TABLE SALDOS (
     ID_SALDO INT AUTO_INCREMENT PRIMARY KEY,
     DATA_HORA DATETIME NOT NULL,
@@ -79,14 +74,19 @@ CREATE TABLE SALDOS (
     DATA_CRIACAO DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	 CONSTRAINT FK_LANCAMENTO_SALDO FOREIGN KEY(ID_LANC) REFERENCES lancamentos(ID_LANC)
 );
+-- ===================================================================================================================
 
+-- ===================================================================================================================
+-- Insere os registros na tabelas saldos a partir de um arquivo .txt
+-- ===================================================================================================================
 LOAD DATA LOCAL INFILE 'C:/Users/adeni/workspace/java/Teste/arquivos/baseSaldos.txt'
 INTO TABLE SALDOS character set latin1
 FIELDS TERMINATED BY ';' LINES TERMINATED BY ';;';
+-- ===================================================================================================================
 
-SELECT * FROM saldos;
-
---- CENTRO DE CUSTO ---
+-- ===================================================================================================================
+-- Cria a tabela Centro de Custo
+-- ===================================================================================================================
 CREATE TABLE CCUSTO(
 ID_CCUSTO INT AUTO_INCREMENT PRIMARY KEY,
 DESCRI VARCHAR(50) NOT NULL,
@@ -94,15 +94,19 @@ DATA_CRIACAO DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ID_USUARIO INT NOT NULL,
 D_E_L_E_T_ CHAR(1) NOT NULL
 );
+-- ===================================================================================================================
 
+-- ===================================================================================================================
+-- Insere os registros na tabelas Centro de Custo a partir de um arquivo .txt
+-- ===================================================================================================================
 LOAD DATA LOCAL INFILE 'C:/Users/adeni/workspace/java/Teste/arquivos/baseCCusto.txt'
 INTO TABLE CCUSTO character set latin1
 FIELDS TERMINATED BY ';' LINES TERMINATED BY ';;';
+-- ===================================================================================================================
 
-SELECT * FROM ccusto;
-
-
--- USUÁRIOS --
+-- ===================================================================================================================
+-- Cria a tabela usuários
+-- ===================================================================================================================
 CREATE TABLE USUARIOS(
 ID_USUARIO INT AUTO_INCREMENT PRIMARY KEY,
 NOME_COMPLETO VARCHAR(100) NOT NULL,
@@ -112,24 +116,26 @@ SENHA VARCHAR(20) NOT NULL,
 DATA_CRIACAO DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 D_E_L_E_T_ CHAR(1) NOT NULL
 );
+-- ===================================================================================================================
 
+-- ===================================================================================================================
+-- Insere um registro na tabela Usuários
+-- ===================================================================================================================
 INSERT INTO USUARIOS(NOME_COMPLETO, EMAIL, SENHA, D_E_L_E_T_) 
 VALUES('Adenilson Soares da Silva', 'adenilson_denis8@hotmail.com', 'TESTE', '');
+-- ===================================================================================================================
 
-/*
-INSERT INTO USUARIOS(NOME_COMPLETO, EMAIL, SENHA, D_E_L_E_T_) 
-VALUES('Adenilson Soares da Silva', 'adenilson_denis8@hotmail.com', CONVERT(VARBINARY(256),pwdencrypt('Asvezesfalo8')), '');
-*/
-
--- SELECT pwdcompare('Asvezesfalo8', SENHA), * FROM USUARIOS;
-SELECT * FROM usuarios;
-
+-- ===================================================================================================================
 -- Backup e Restore
 -- Execute os comandos no prompt (dieretório: C:\Program Files\MariaDB 10.6\bin)
+-- ===================================================================================================================
 mysqldump -u root -p gestaofinanceira > C:\EducacaoFinanceira\backup\backup.sql
 mysql -u root -p gestaofinanceira_dev < C:\EducacaoFinanceira\backup\backup.sql
+-- ===================================================================================================================
 
+-- ===================================================================================================================
 -- Procedure e Triggers para atualização de saldos
+-- ===================================================================================================================
 USE GestaoFinanceira_Dev; 
 
 DROP PROCEDURE IF EXISTS ATUALIZA_SALDOS;
@@ -154,24 +160,25 @@ BEGIN
 	DECLARE QUANTIDADE				INT;
 	
 	DECLARE FORLANCAMENTOS CURSOR FOR SELECT 
-			  ID_LANC,
-			  DATA_HORA, 
-			  VALOR, 
-			  DESCRICAO,
-			  (SELECT DESCRI FROM ccusto WHERE ID_CCUSTO = LANC.ID_CCUSTO AND LANC.D_E_L_E_T_ <> '*') AS CCENTRO, 
-			  STATUS_LANC, 
-			  DATA_CRIACAO, 
-			  ID_USUARIO 
+			  LANC.ID_LANC,
+			  LANC.DATA_HORA, 
+			  LANC.VALOR, 
+			  LANC.DESCRICAO,
+			  (SELECT DESCRI FROM ccusto WHERE ID_CCUSTO = LANC.ID_CCUSTO AND D_E_L_E_T_ <> '*') AS CCENTRO, 
+			  LANC.STATUS_LANC, 
+			  LANC.DATA_CRIACAO, 
+			  LANC.ID_USUARIO 
         FROM 
 		  		lancamentos AS LANC
 		  	WHERE 
-		  		DATA_HORA>=DATE(DATA_REGISTRO) AND STATUS_LANC IN('Pago','Recebido') AND D_E_L_E_T_<>'*'
+		  		LANC.DATA_HORA>=DATE(DATA_REGISTRO) AND LANC.STATUS_LANC IN('Pago','Recebido') AND 
+				ID_USUARIO=1 AND LANC.D_E_L_E_T_<>'*'
         ORDER BY 
 		  		DATA_HORA, DATA_CRIACAO;		  		
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	
-	DELETE FROM saldos WHERE DATA_HORA >= DATE(DATA_REGISTRO);
-	SELECT COUNT(*) INTO QUANTIDADE FROM saldos;	
+	DELETE FROM saldos WHERE DATA_HORA >= DATE(DATA_REGISTRO) AND ID_USUARIO=1;
+	SELECT COUNT(*) INTO QUANTIDADE FROM saldos WHERE ID_USUARIO=1;	
 	
 	IF QUANTIDADE>0 THEN	
 		SELECT SALDO INTO _SALDO FROM saldos ORDER BY DATA_HORA DESC LIMIT 1;
@@ -249,7 +256,22 @@ END$
 
 -- CALL ATUALIZA_SALDOS('2023-03-10 11:00:00');
 -- SELECT * FROM saldos;
+-- ===================================================================================================================
 
-
-
-
+-- ===================================================================================================================
+-- Consulta de gastos mensais
+-- ===================================================================================================================
+SELECT 
+	SUM(VALOR) AS VALOR_GASTO_MES,
+	YEAR(DATA_HORA) AS ANO,
+	MONTHNAME(DATA_HORA) AS MES,
+	DATA_HORA
+FROM 
+	LANCAMENTOS
+WHERE
+	STATUS_LANC='Pago' AND ID_CCUSTO NOT IN(19) AND D_E_L_E_T_<>'*'
+GROUP BY
+	YEAR(DATA_HORA), MONTHNAME(DATA_HORA)
+ORDER BY
+	DATA_HORA
+-- ===================================================================================================================
