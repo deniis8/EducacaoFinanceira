@@ -4,7 +4,6 @@ CREATE DATABASE GestaoFinanceira_Dev;
 -- Coloca em uso a base de dados
 USE GestaoFinanceira_Dev; 
 
--- Deleta a tabela
 -- ===================================================================================================================
 -- Cria a tabela
 -- ===================================================================================================================
@@ -143,7 +142,7 @@ DROP PROCEDURE IF EXISTS ATUALIZA_SALDOS;
 -- PROCEDURE 
 DELIMITER $$
 
-CREATE PROCEDURE ATUALIZA_SALDOS (IN DATA_REGISTRO DATETIME) 
+CREATE PROCEDURE ATUALIZA_SALDOS (IN DATA_REGISTRO DATETIME, IN ID_USER INT) 
 
 BEGIN
 	DECLARE done INT DEFAULT FALSE;
@@ -164,7 +163,7 @@ BEGIN
 			  LANC.DATA_HORA, 
 			  LANC.VALOR, 
 			  LANC.DESCRICAO,
-			  (SELECT DESCRI FROM ccusto WHERE ID_CCUSTO = LANC.ID_CCUSTO AND D_E_L_E_T_ <> '*') AS CCENTRO, 
+			  (SELECT DESCRI FROM ccusto AS CC WHERE CC.ID_USUARIO=ID_USER AND CC.ID_CCUSTO = LANC.ID_CCUSTO AND CC.D_E_L_E_T_ <> '*') AS CCENTRO, 
 			  LANC.STATUS_LANC, 
 			  LANC.DATA_CRIACAO, 
 			  LANC.ID_USUARIO 
@@ -172,7 +171,7 @@ BEGIN
 		  		lancamentos AS LANC
 		  	WHERE 
 		  		LANC.DATA_HORA>=DATE(DATA_REGISTRO) AND LANC.STATUS_LANC IN('Pago','Recebido') AND 
-				ID_USUARIO=1 AND LANC.D_E_L_E_T_<>'*'
+				ID_USUARIO=ID_USER AND LANC.D_E_L_E_T_<>'*'
         ORDER BY 
 		  		DATA_HORA, DATA_CRIACAO;		  		
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -231,7 +230,8 @@ CREATE TRIGGER ALT_ATUALIZA_SALDOS AFTER UPDATE
 ON lancamentos
 FOR EACH ROW
 BEGIN
-CALL ATUALIZA_SALDOS(NEW.DATA_HORA);
+CALL ATUALIZA_SALDOS(NEW.DATA_HORA, NEW.ID_USUARIO);
+CALL ATUALIZA_GASTOS_MENSAIS(NEW.ID_USUARIO);
 END$
 
 DROP TRIGGER IF EXISTS DEL_ATUALIZA_SALDOS;
@@ -241,7 +241,8 @@ CREATE TRIGGER DEL_ATUALIZA_SALDOS AFTER DELETE
 ON lancamentos
 FOR EACH ROW
 BEGIN
-CALL ATUALIZA_SALDOS(OLD.DATA_HORA);
+CALL ATUALIZA_SALDOS(OLD.DATA_HORA, OLD.ID_USUARIO);
+CALL ATUALIZA_GASTOS_MENSAIS(OLD.ID_USUARIO);
 END$
 
 DROP TRIGGER IF EXISTS INSERT_ATUALIZA_SALDOS;
@@ -251,11 +252,100 @@ CREATE TRIGGER INSERT_ATUALIZA_SALDOS AFTER INSERT
 ON lancamentos
 FOR EACH ROW
 BEGIN
-CALL ATUALIZA_SALDOS(NEW.DATA_HORA);
+CALL ATUALIZA_SALDOS(NEW.DATA_HORA, NEW.ID_USUARIO);
+CALL ATUALIZA_GASTOS_MENSAIS(NEW.ID_USUARIO);
 END$
 
 -- CALL ATUALIZA_SALDOS('2023-03-10 11:00:00');
 -- SELECT * FROM saldos;
+-- ===================================================================================================================
+
+-- ===================================================================================================================
+-- Cria a tabela
+-- ===================================================================================================================
+CREATE TABLE gastosmensais(
+ID_GASTO_MENSAL INT AUTO_INCREMENT PRIMARY KEY,
+VALOR NUMERIC(10,2) NOT NULL,
+ANO INT NOT NULL,
+MES VARCHAR(20) NOT NULL,
+DATA_HORA DATETIME NOT NULL,
+ID_USUARIO INT NOT NULL
+);
+-- ===================================================================================================================
+
+-- ===================================================================================================================
+-- Procedure Gastos mensais
+-- ===================================================================================================================
+DROP PROCEDURE IF EXISTS ATUALIZA_GASTOS_MENSAIS;
+
+-- PROCEDURE 
+DELIMITER $$
+
+CREATE PROCEDURE ATUALIZA_GASTOS_MENSAIS (IN ID_USER INT) 
+
+BEGIN
+	DECLARE done INT DEFAULT FALSE;
+	
+	DECLARE INSERT_VALOR 			NUMERIC(10,2); 
+	DECLARE INSERT_ANO 				INT;
+	DECLARE INSERT_MES			 	VARCHAR(20);
+	DECLARE INSERT_DATA_HORA 		DATETIME; 
+	DECLARE INSERT_ID_USUARIO 		INT;
+	
+	DECLARE GASTOSMES CURSOR FOR SELECT 
+		SUM(VALOR) AS VALOR,
+		YEAR(DATA_HORA) AS ANO,
+		CASE MONTH(DATA_HORA) 
+    	  WHEN 1 THEN 'Janeiro' 
+        WHEN 2 THEN 'Fevereiro' 
+        WHEN 3 THEN 'Março' 
+        WHEN 4 THEN 'Abril' 
+        WHEN 5 THEN 'Maio' 
+        WHEN 6 THEN 'Junho' 
+        WHEN 7 THEN 'Julho' 
+		  WHEN 8 THEN 'Agosto' 
+		  WHEN 9 THEN 'Setembro' 
+		  WHEN 10 THEN 'Outubro' 
+		  WHEN 11 THEN 'Novembro' 
+		  WHEN 12 THEN 'Dezembro'         
+   	END AS MES,
+		DATA_HORA,
+		ID_USUARIO 
+	FROM 
+		LANCAMENTOS
+	WHERE
+		STATUS_LANC='Pago' AND ID_CCUSTO NOT IN(19) AND ID_USUARIO=ID_USER AND D_E_L_E_T_<>'*'
+	GROUP BY
+		YEAR(DATA_HORA), MONTHNAME(DATA_HORA)
+	ORDER BY
+		DATA_HORA;		  		
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;	
+	
+	DELETE FROM GASTOSMENSAIS WHERE ID_USUARIO=ID_USER;
+		  		
+  	OPEN GASTOSMES;
+  	
+  	-- Percorrer Lançamentos e fazer insert na tabela saldos
+	read_loop: loop	
+		FETCH GASTOSMES INTO INSERT_VALOR, INSERT_ANO, INSERT_MES, INSERT_DATA_HORA, INSERT_ID_USUARIO;
+			  
+		IF done THEN
+			LEAVE read_loop;
+    	END IF;
+   
+   
+	INSERT INTO GASTOSMENSAIS(VALOR, ANO, MES, DATA_HORA, ID_USUARIO) 
+		VALUES(INSERT_VALOR, 
+				  INSERT_ANO, 
+				  INSERT_MES, 
+				  INSERT_DATA_HORA, 
+				  INSERT_ID_USUARIO);
+				  
+	end loop read_loop;
+	
+	CLOSE GASTOSMES;
+
+END $$
 -- ===================================================================================================================
 
 -- ===================================================================================================================
@@ -264,8 +354,21 @@ END$
 SELECT 
 	SUM(VALOR) AS VALOR_GASTO_MES,
 	YEAR(DATA_HORA) AS ANO,
-	MONTHNAME(DATA_HORA) AS MES,
-	DATA_HORA
+	MONTHNAME(DATA_HORA) AS MES1,
+	CASE MONTH(DATA_HORA) 
+    	  WHEN 1 THEN 'Janeiro' 
+        WHEN 2 THEN 'Fevereiro' 
+        WHEN 3 THEN 'Março' 
+        WHEN 4 THEN 'Abril' 
+        WHEN 5 THEN 'Maio' 
+        WHEN 6 THEN 'Junho' 
+        WHEN 7 THEN 'Julho' 
+		  WHEN 8 THEN 'Agosto' 
+		  WHEN 9 THEN 'Setembro' 
+		  WHEN 10 THEN 'Outubro' 
+		  WHEN 11 THEN 'Novembro' 
+		  WHEN 12 THEN 'Dezembro'         
+   END AS MES 
 FROM 
 	LANCAMENTOS
 WHERE
