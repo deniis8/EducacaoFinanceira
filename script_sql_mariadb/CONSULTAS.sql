@@ -1,5 +1,5 @@
 -- Cria a base de dados
-CREATE DATABASE GestaoFinanceira_Dev; 
+CREATE DATABASE GestaoFinanceira; 
 
 -- Coloca em uso a base de dados
 USE GestaoFinanceira_Dev; 
@@ -232,6 +232,7 @@ FOR EACH ROW
 BEGIN
 CALL ATUALIZA_SALDOS(NEW.DATA_HORA, NEW.ID_USUARIO);
 CALL ATUALIZA_GASTOS_MENSAIS(NEW.ID_USUARIO);
+CALL ATUALIZA_SALDOS_INVESTIMENTOS(NEW.ID_USUARIO);
 END$
 
 DROP TRIGGER IF EXISTS DEL_ATUALIZA_SALDOS;
@@ -243,6 +244,7 @@ FOR EACH ROW
 BEGIN
 CALL ATUALIZA_SALDOS(OLD.DATA_HORA, OLD.ID_USUARIO);
 CALL ATUALIZA_GASTOS_MENSAIS(OLD.ID_USUARIO);
+CALL ATUALIZA_SALDOS_INVESTIMENTOS(OLD.ID_USUARIO);
 END$
 
 DROP TRIGGER IF EXISTS INSERT_ATUALIZA_SALDOS;
@@ -254,6 +256,7 @@ FOR EACH ROW
 BEGIN
 CALL ATUALIZA_SALDOS(NEW.DATA_HORA, NEW.ID_USUARIO);
 CALL ATUALIZA_GASTOS_MENSAIS(NEW.ID_USUARIO);
+CALL ATUALIZA_SALDOS_INVESTIMENTOS(NEW.ID_USUARIO);
 END$
 
 -- CALL ATUALIZA_SALDOS('2023-03-10 11:00:00');
@@ -349,32 +352,69 @@ END $$
 -- ===================================================================================================================
 
 -- ===================================================================================================================
--- Consulta de gastos mensais
+-- Cria a tabela Saldos
 -- ===================================================================================================================
-SELECT 
-	SUM(VALOR) AS VALOR_GASTO_MES,
-	YEAR(DATA_HORA) AS ANO,
-	MONTHNAME(DATA_HORA) AS MES1,
-	CASE MONTH(DATA_HORA) 
-    	  WHEN 1 THEN 'Janeiro' 
-        WHEN 2 THEN 'Fevereiro' 
-        WHEN 3 THEN 'Março' 
-        WHEN 4 THEN 'Abril' 
-        WHEN 5 THEN 'Maio' 
-        WHEN 6 THEN 'Junho' 
-        WHEN 7 THEN 'Julho' 
-		  WHEN 8 THEN 'Agosto' 
-		  WHEN 9 THEN 'Setembro' 
-		  WHEN 10 THEN 'Outubro' 
-		  WHEN 11 THEN 'Novembro' 
-		  WHEN 12 THEN 'Dezembro'         
-   END AS MES 
-FROM 
-	LANCAMENTOS
-WHERE
-	STATUS_LANC='Pago' AND ID_CCUSTO NOT IN(19) AND D_E_L_E_T_<>'*'
-GROUP BY
-	YEAR(DATA_HORA), MONTHNAME(DATA_HORA)
-ORDER BY
-	DATA_HORA
+CREATE TABLE SALDOSINVESTIMENTOS(
+ID_SALDO INT AUTO_INCREMENT PRIMARY KEY,
+SALDO NUMERIC(10,2),
+INVESTIMENTO_FIXO NUMERIC(10,2),
+INVESTIMENTO_VARIAVEL NUMERIC(10,2),
+DATA_CRIACAO DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ID_USUARIO INT NOT NULL
+);
+
+SELECT * FROM saldosinvestimentos;
+-- ===================================================================================================================
+
+-- ===================================================================================================================
+-- Procedure Gastos mensais
+-- ===================================================================================================================
+DROP PROCEDURE IF EXISTS ATUALIZA_SALDOS_INVESTIMENTOS;
+
+-- PROCEDURE 
+DELIMITER $$
+
+CREATE PROCEDURE ATUALIZA_SALDOS_INVESTIMENTOS (IN ID_USER INT) 
+
+BEGIN
+	DECLARE done INT DEFAULT FALSE;
+	
+	DECLARE INSERT_SALDO NUMERIC(10,2);
+	DECLARE INSERT_INVESTIMENTO_FIXO NUMERIC(10,2);
+	DECLARE INSERT_INVESTIMENTO_VARIAVEL NUMERIC(10,2);
+	DECLARE INSERT_ID_USUARIO INT;
+	
+	DECLARE SALDOINVESTIMEN CURSOR FOR SELECT 
+		IF(ISNULL((SELECT SALDO FROM saldos WHERE ID_USUARIO=ID_USER ORDER BY DATA_HORA DESC, ID_LANC DESC LIMIT 1)),0,(SELECT SALDO FROM saldos WHERE ID_USUARIO=ID_USER ORDER BY DATA_HORA DESC, ID_LANC DESC LIMIT 1)) AS SALDO,
+		IF(ISNULL((SELECT SUM(VALORLAN) FROM saldos WHERE ccusto='Investimento Fixo' AND ID_USUARIO=ID_USER)),0,(SELECT SUM(VALORLAN) FROM saldos WHERE ccusto='Investimento Fixo' AND ID_USUARIO=ID_USER)) AS INVESTIMENTO_FIXO,
+		IF(ISNULL((SELECT SUM(VALORLAN) FROM saldos WHERE ccusto='Investimento Variável' AND ID_USUARIO=ID_USER)),0,(SELECT SUM(VALORLAN) FROM saldos WHERE ccusto='Investimento Variável' AND ID_USUARIO=ID_USER)) AS INVESTIMENTO_VARIAVEL,
+		ID_USUARIO 
+	FROM 
+		lancamentos LIMIT 1;	
+	 	  		
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;	
+	DELETE FROM saldosinvestimentos WHERE ID_USUARIO=ID_USER;
+		  		
+  	OPEN SALDOINVESTIMEN;
+  	
+  	-- Percorrer Lançamentos e fazer insert na tabela saldos
+	read_loop: loop	
+		FETCH SALDOINVESTIMEN INTO INSERT_SALDO, INSERT_INVESTIMENTO_FIXO, INSERT_INVESTIMENTO_VARIAVEL, INSERT_ID_USUARIO;
+			  
+		IF done THEN
+			LEAVE read_loop;
+    	END IF;
+   
+   
+	INSERT INTO SALDOSINVESTIMENTOS(SALDO, INVESTIMENTO_FIXO, INVESTIMENTO_VARIAVEL, ID_USUARIO) 
+		VALUES(INSERT_SALDO, 
+				  INSERT_INVESTIMENTO_FIXO, 
+				  INSERT_INVESTIMENTO_VARIAVEL, 
+				  INSERT_ID_USUARIO);
+				  
+	end loop read_loop;
+	
+	CLOSE SALDOINVESTIMEN;
+
+END $$
 -- ===================================================================================================================
