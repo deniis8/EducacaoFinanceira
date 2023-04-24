@@ -15,13 +15,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 
 /**
  *
@@ -33,7 +34,7 @@ public class Consultas {
 	private double totalAR;
 	private double totalR;
 	DecimalFormat dFN = new DecimalFormat("0.00");
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	PreparedStatement pst;
 
 	public void selectLanca(DefaultTableModel modTabLanc, JTable table, JLabel lblTotalAP, JLabel lblTotalP, JLabel lblTotalAR, JLabel lblTotalR) throws ParseException {
@@ -41,7 +42,7 @@ public class Consultas {
 		totalP = 0;
 		totalAR = 0;
 		totalR = 0;
-		String sql = "SELECT ID, DATA, DIAS_SEMANA, VALOR, DESCRICAO, CODCCUSTO|| '-' ||CCENTRO, STATUS FROM VW_LANCAMENTOS ";
+		String sql = "SELECT ID, DATA_HORA, DIAS_SEMANA, VALOR, DESCRICAO, CONCAT_WS(' - ',CODCCUSTO, CCENTRO) AS CENTRO_CUSTO, STATUS_LANC FROM VW_LANCAMENTOS ";
 		conexao.abrir();
 		zeraTabelaPrincipal(modTabLanc);
 		try {
@@ -62,10 +63,11 @@ public class Consultas {
 					totalR += rs.getDouble(4);
 				}
 			}
-			lblTotalAP.setText("A Pagar...: "+Double.valueOf(dFN.format(totalAP).replace(",", ".")));
-			lblTotalP.setText("Pago........: "+Double.valueOf(dFN.format(totalP).replace(",", ".")));
-			lblTotalAR.setText("A Receber....: "+Double.valueOf(dFN.format(totalAR).replace(",", ".")));
-			lblTotalR.setText("Recebido......: "+Double.valueOf(dFN.format(totalR).replace(",", ".")));
+			lblTotalAP.setText("A Pagar...: " + new DecimalFormat("#,##0.00").format(totalAP));
+			lblTotalP.setText("Pago........: " + new DecimalFormat("#,##0.00").format(totalP));
+			lblTotalAR.setText("A Receber....: " + new DecimalFormat("#,##0.00").format(totalAR));
+			lblTotalR.setText("Recebido......: " + new DecimalFormat("#,##0.00").format(totalR));
+			
 		} catch (SQLException e) {
 			System.out.println("Erro: " + e.getMessage());
 		}
@@ -74,13 +76,15 @@ public class Consultas {
 	}
 
 	public void selectUlt(JLabel lblSaldo) {
-		String slqUlt = "SELECT SALDO FROM SALDOS ORDER BY DATA DESC, HORA DESC, ID_LANC DESC LIMIT 1";
+		String slqUlt = "SELECT SALDO FROM SALDOS ORDER BY DATA_HORA DESC, ID_LANC DESC LIMIT 1";
 
 		conexao.abrir();
 		try {
 			pst = conexao.getConexao().prepareStatement(slqUlt);
 			ResultSet rs = pst.executeQuery();
-			lblSaldo.setText("Saldo Bancário......: " + rs.getDouble(1));
+			while (rs.next()) {
+				lblSaldo.setText("Saldo Bancário......: " + new DecimalFormat("#,##0.00").format(rs.getDouble(1)));
+			}
 			/*if (rs.getDouble(1) > 0) {
 				lblSaldo.setForeground(new Color(5, 113, 0));
 			} else {
@@ -93,13 +97,15 @@ public class Consultas {
 
 	public void selectInvF(JLabel lblInvF) {
 		//String slqUlt = "SELECT PRINTF('%.2f',SUM(VALORLAN)) FROM SALDOS WHERE CCUSTO IN('Investimento Fixo','Juros Positivo')";
-		String slqUlt = "SELECT PRINTF('%.2f',SUM(VALORLAN)) FROM SALDOS WHERE CCUSTO IN('Investimento Fixo')";
+		String slqUlt = "SELECT SUM(VALORLAN) FROM SALDOS WHERE CCUSTO IN('Investimento Fixo')";
 
 		conexao.abrir();
 		try {
 			pst = conexao.getConexao().prepareStatement(slqUlt);
 			ResultSet rs = pst.executeQuery();
-			lblInvF.setText("Investimento Fixo..: " + rs.getDouble(1));
+			while (rs.next()) {
+				lblInvF.setText("Investimento Fixo..: " + new DecimalFormat("#,##0.00").format(rs.getDouble(1)));
+			}
 			/*if (rs.getDouble(1) > 0) {
 				lblInvF.setForeground(new Color(5, 113, 0));
 			} else {
@@ -111,13 +117,15 @@ public class Consultas {
 	}
 
 	public void selectInvV(JLabel lblInvV) {
-		String slqUlt = "SELECT SUM(VALORLAN) FROM SALDOS WHERE CCUSTO='Investimento Variável'";
+		String slqUlt = "SELECT SUM(VALORLAN) FROM SALDOS WHERE CCUSTO IN('Investimento Variável')";
 
 		conexao.abrir();
 		try {
 			pst = conexao.getConexao().prepareStatement(slqUlt);
 			ResultSet rs = pst.executeQuery();
-			lblInvV.setText("Investimento Variável...: " + rs.getDouble(1));
+			while (rs.next()) {
+				lblInvV.setText("Investimento Variável...: " + new DecimalFormat("#,##0.00").format(rs.getDouble(1)));
+			}
 			/*if (rs.getDouble(1) > 0) {
 				lblInvV.setForeground(new Color(5, 113, 0));
 			} else {
@@ -142,7 +150,7 @@ public class Consultas {
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			String deN = df.format(de.getDate());
 	        String ateN = df.format(ate.getDate());
-			String query = "SELECT ID, DATA, DIAS_SEMANA, VALOR, DESCRICAO, CODCCUSTO|| '-' ||CCENTRO, STATUS FROM VW_LANCAMENTOS WHERE "; 
+			String query = "SELECT ID, DATA_HORA, DIAS_SEMANA, VALOR, DESCRICAO, CONCAT_WS(' - ',CODCCUSTO, CCENTRO) AS DETALHE_CCUSTO, STATUS_LANC FROM VW_LANCAMENTOS WHERE "; 
 			
 					
 					if(recebido.isSelected()) {
@@ -157,11 +165,11 @@ public class Consultas {
 					if(aReceber.isSelected()) {
 						aReceb = "A Receber"; 
 					}			
-					query+="STATUS IN('"+receb+"','"+pag+"','"+aPag+"','"+aReceb+"') AND ";
+					query+="STATUS_LANC IN('"+receb+"','"+pag+"','"+aPag+"','"+aReceb+"') AND ";
 					if(!boxCC.getSelectedItem().equals("Todos")) {
 						query+="CCENTRO='"+boxCC.getSelectedItem()+"' AND ";
 					}					
-					query+="DATA BETWEEN '"+deN+"' AND '"+ateN+"' ";
+					query+="DATA_HORA BETWEEN '"+deN+"' AND '"+ateN+"' ";
 
 			conexao.abrir();
 			try {
@@ -181,17 +189,19 @@ public class Consultas {
 						totalR += rs.getDouble(4);
 					}
 				}
-				lblTotalAP.setText("A Pagar...: "+Double.valueOf(dFN.format(totalAP).replace(",", ".")));
-				lblTotalP.setText("Pago........: "+Double.valueOf(dFN.format(totalP).replace(",", ".")));
-				lblTotalAR.setText("A Receber....: "+Double.valueOf(dFN.format(totalAR).replace(",", ".")));
-				lblTotalR.setText("Recebido......: "+Double.valueOf(dFN.format(totalR).replace(",", ".")));
+				
+				lblTotalAP.setText("A Pagar...: " + new DecimalFormat("#,##0.00").format(totalAP));
+				lblTotalP.setText("Pago........: " + new DecimalFormat("#,##0.00").format(totalP));
+				lblTotalAR.setText("A Receber....: " + new DecimalFormat("#,##0.00").format(totalAR));
+				lblTotalR.setText("Recebido......: " + new DecimalFormat("#,##0.00").format(totalR));
+				
 			} catch (Exception e) {
 			}
 			conexao.fechar();
 		}		
 	}
 
-	public void selecBox(JComboBox<String> itens, String opc) {
+	public void selectComboboxCentroCusto(JComboBox<String> itens, String opc) {
 		String query = "SELECT DESCRI FROM CCUSTO WHERE D_E_L_E_T_<>'*' ORDER BY DESCRI";
 		ArrayList<String> cCusto = new ArrayList<>();
 		if(opc.equals("S")) {
@@ -214,29 +224,33 @@ public class Consultas {
 	}
 	
 	public void selectLanJ(String cod, JFormattedTextField txtEmiss, JFormattedTextField txtHora, JTextField txtValor, JTextField txtDesc, JComboBox<?> boxStatus, JComboBox<?> boxCCusto) {
-		String query = " SELECT ";     
-		query += " 	   ID_LANC, ";      
-		query += "     DATA, ";     
-		query += "     HORA, ";     
-		query += "     VALOR, " ;    
-		query += "     STATUS, ";     
-		query += "     DESCRICAO, ";     
-		query += "     (SELECT DESCRI FROM CCUSTO WHERE ID_CCUSTO=LAN.ID_CCUSTO AND D_E_L_E_T_<>'*') AS CCDESC "; 
-		query += " FROM ";    
-		query += "     LANCAMENTOS AS LAN "; 
-		query += " WHERE ";      
-		query += "     ID_LANC='"+cod+"' AND D_E_L_E_T_<>'*' ";
+	
+		String query = " SELECT "; 	   
+		query += "     ID_LANC, ";       
+		query += "     CAST(DATA_HORA AS DATE) AS DATA_LANCAMENTO, ";        
+		query += "     TIME(DATA_HORA) AS HORA_LANCAMENTO, ";   
+		query += "     VALOR, ";       
+		query += "     STATUS_LANC, ";       
+		query += "     DESCRICAO, ";       
+		query += "     (SELECT DESCRI FROM CCUSTO WHERE ID_CCUSTO=LAN.ID_CCUSTO AND D_E_L_E_T_<>'*') AS CCDESC ";   
+		query += " FROM ";       
+		query += "     LANCAMENTOS AS LAN ";   
+		query += " WHERE ";       
+		query += "     ID_LANC='"+cod+"' AND D_E_L_E_T_<>'*' "; 
+		
 		conexao.abrir();
 		try {
 			pst = conexao.getConexao().prepareStatement(query);
 			ResultSet rs = pst.executeQuery();
-			txtEmiss.setText(Mascaras.formatData(rs.getString(2),"1"));
-			txtHora.setText(rs.getString(3));
-			txtValor.setText(rs.getString(4));
-			txtDesc.setText(rs.getString(6));
-			boxStatus.setSelectedItem(rs.getString(5));
-			boxCCusto.setSelectedItem(rs.getString(7));
-		} catch (SQLException e) {} 
+			while (rs.next()) {
+				txtEmiss.setText(Mascaras.formatData(rs.getString(2),"1"));
+				txtHora.setText(rs.getString(3));
+				txtValor.setText(rs.getString(4));
+				txtDesc.setText(rs.getString(6));
+				boxStatus.setSelectedItem(rs.getString(5));
+				boxCCusto.setSelectedItem(rs.getString(7));
+			}
+		} catch (SQLException e) {JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());} 
 		conexao.fechar();
 	}
 

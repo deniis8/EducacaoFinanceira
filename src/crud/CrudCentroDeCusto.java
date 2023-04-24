@@ -8,12 +8,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 import interfaces.CrudCentroCusto;
 
 public class CrudCentroDeCusto implements CrudCentroCusto{
 	
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	PreparedStatement pst;
 	
 	public void selecCC(DefaultTableModel modTabLanc, JTable table) throws ParseException {		
@@ -42,12 +42,13 @@ public class CrudCentroDeCusto implements CrudCentroCusto{
 
 		conexao.abrir();
 		String insert = "";
-		insert = "INSERT INTO CCUSTO(DESCRI, D_E_L_E_T_) ";
-		insert += "VALUES(?,?)";
+		insert = "INSERT INTO CCUSTO(DESCRI, ID_USUARIO, D_E_L_E_T_) ";
+		insert += "VALUES(?,?,?)";
 		try {
 			pst = conexao.getConexao().prepareStatement(insert);
 			pst.setString(1, descri);
-			pst.setString(2, "");
+			pst.setInt(2, 1);
+			pst.setString(3, "");
 			pst.executeUpdate();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());

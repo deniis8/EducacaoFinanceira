@@ -3,21 +3,21 @@ package crud;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
 
-import configuracao.banco.dados.ConexaoBancoDadosSQLite;
+import configuracao.banco.dados.ConexaoBancoDados;
 import interfaces.CrudLancamentos;
 import mascaras.Mascaras;
 
 public class CrudLancamento implements CrudLancamentos{
 
-	ConexaoBancoDadosSQLite conexao = new ConexaoBancoDadosSQLite();
+	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	private PreparedStatement pst;
-	private PreparedStatement pst2;
-	private String idLan = "";
+	private int idLan = 0;
 	
 	
 
@@ -50,10 +50,9 @@ public class CrudLancamento implements CrudLancamentos{
         }
 
         String sqlCli = "UPDATE LANCAMENTOS SET \n"
-                + "    DATA = ?,\n"
-                + "    HORA = ?,\n"
+                + "    DATA_HORA = ?,\n"
                 + "    VALOR = ?,\n"
-                + "    STATUS = ?,\n"
+                + "    STATUS_LANC = ?,\n"
                 + "    DESCRICAO = ?,\n"
                 + "    ID_CCUSTO = ?\n"
                 + "WHERE \n"
@@ -61,12 +60,11 @@ public class CrudLancamento implements CrudLancamentos{
 
         try {
             setPst(conexao.getConexao().prepareStatement(sqlCli));
-            getPst().setString(1, Mascaras.formatData(data, "2"));
-            getPst().setString(2, hora);
-            getPst().setDouble(3, valor);
-            getPst().setString(4, rStatus);
-            getPst().setString(5, desc);
-            getPst().setInt(6, idCC);
+            getPst().setString(1, Mascaras.formatData(data, "2") + " " + hora);
+            getPst().setDouble(2, valor);
+            getPst().setString(3, rStatus);
+            getPst().setString(4, desc);
+            getPst().setInt(5, idCC);
 
             getPst().executeUpdate();
         } catch (SQLException e) {
@@ -76,44 +74,50 @@ public class CrudLancamento implements CrudLancamentos{
     }
 	
 	@Override
-	public void incluirLancamento(String id, String data, String hora, Double valor, String descri, String status, JComboBox<String> boxCC) {
+	public void incluirLancamento(String data, String hora, Double valor, String descri, String status, JComboBox<String> boxCC) {
 		String sqlCC = "SELECT ID_CCUSTO FROM CCUSTO WHERE DESCRI='" + boxCC.getSelectedItem() + "'";
 		int idCC = 0;
-		idLan = id;
 
 		conexao.abrir();
 
 		try {
 			pst = conexao.getConexao().prepareStatement(sqlCC);
 			ResultSet rs = pst.executeQuery();
-			idCC = rs.getInt(1);
+			while (rs.next()) {
+				idCC = rs.getInt(1);
+			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
 
 		String insert = "";
-		insert = "INSERT INTO LANCAMENTOS(ID_LANC, DATA, HORA, VALOR, STATUS, DESCRICAO, ID_CCUSTO, D_E_L_E_T_) ";
-		insert += "VALUES(?,?,?,?,?,?,?,?)";
+		insert = "INSERT INTO LANCAMENTOS(DATA_HORA, VALOR, STATUS_LANC, DESCRICAO, ID_CCUSTO, ID_USUARIO, D_E_L_E_T_) ";
+		insert += "VALUES(?,?,?,?,?,?,?)";
 		try {
-			pst = conexao.getConexao().prepareStatement(insert);
-			pst.setString(1, StringUtils.leftPad(idLan, 6, "0"));
-			pst.setString(2, Mascaras.formatData(data, "2"));
-			pst.setString(3, hora);
-			pst.setDouble(4, valor);
-			pst.setString(5, status);
-			pst.setString(6, descri);
-			pst.setInt(7, idCC);
-			pst.setString(8, "");
+			pst = conexao.getConexao().prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
+			pst.setString(1, Mascaras.formatData(data, "2") + " " + hora);
+			pst.setDouble(2, valor);
+			pst.setString(3, status);
+			pst.setString(4, descri);
+			pst.setInt(5, idCC);
+			pst.setInt(6, 1);
+			pst.setString(7, "");
 			pst.executeUpdate();
+			
+			ResultSet rs = pst.getGeneratedKeys();
+			if(rs.next()){
+				idLan = rs.getInt(1);
+			}		
+			
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
 		}
 		conexao.fechar();
-		insereSald(data, hora, valor, descri, status, boxCC, idLan);
+		//insereSaldo(data, hora, valor, descri, status, boxCC, idLan);
 		
 	}
 	
-    public void insereSald(String data, String hora, double valorLan, String descriLan, String status, JComboBox<String> ccusto, String idLan) {
+    /*public void insereSaldo(String data, String hora, double valorLan, String descriLan, String status, JComboBox<String> ccusto, int idLan) {
         DecimalFormat df = new DecimalFormat("0.00");
         String sqlSaldoF = "SELECT SALDO FROM SALDOS ORDER BY ID_SALDO DESC LIMIT 1";
         double saldoF = 0;
@@ -133,38 +137,24 @@ public class CrudLancamento implements CrudLancamentos{
             System.out.println("Erro: " + e.getMessage());
         }
         
-        String sqlIdSaldo = "SELECT MAX(ID_SALDO) FROM SALDOS";
-        String idSaldo = "1";
-        try {
-        	pst2 = conexao.getConexao().prepareStatement(sqlIdSaldo);
-            ResultSet rs = pst2.executeQuery();
-            if(rs.getString(1)!=null) {
-            	idSaldo = Integer.toString(Integer.parseInt(rs.getString(1))+1);
-            }
-            
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
-        }
-
-        String sql = "INSERT INTO SALDOS(ID_SALDO, DATA, HORA, VALORLAN, DESCRILAN, SALDO, STATUS, CCUSTO, ID_LANC) VALUES (?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO SALDOS(DATA_HORA, VALORLAN, DESCRILAN, SALDO, STATUS_LANC, CCUSTO, ID_LANC, ID_USUARIO) VALUES (?,?,?,?,?,?,?,?)";
         try {
             pst = conexao.getConexao().prepareStatement(sql);
-            pst.setString(1, StringUtils.leftPad(idSaldo, 6, "0"));
-            pst.setString(2, Mascaras.formatData(data, "2"));
-            pst.setString(3, hora);
-            pst.setDouble(4, valorLan);
-            pst.setString(5, descriLan);
+            pst.setString(1, Mascaras.formatData(data, "2") + " " + hora);
+            pst.setDouble(2, valorLan);
+            pst.setString(3, descriLan);
             if (status.equals("Pago")) {
-                pst.setDouble(6, Double.valueOf(df.format(saldoF - valorLan).replace(",", ".")));
+                pst.setDouble(4, Double.valueOf(df.format(saldoF - valorLan).replace(",", ".")));
                 isExecS = true;
             } 
             else if(status.equals("Recebido")){
-                pst.setDouble(6, Double.valueOf(df.format(saldoF + valorLan).replace(",", ".")));
+                pst.setDouble(4, Double.valueOf(df.format(saldoF + valorLan).replace(",", ".")));
                 isExecS = true;
             }
-            pst.setString(7, status);
-            pst.setString(8, ccusto.getSelectedItem().toString());
-            pst.setString(9, StringUtils.leftPad(idLan, 6, "0"));
+            pst.setString(5, status);
+            pst.setString(6, ccusto.getSelectedItem().toString());
+            pst.setInt(7, idLan);
+            pst.setInt(8, 1);
             if(isExecS) {
             	pst.executeUpdate();
             }            
@@ -174,7 +164,7 @@ public class CrudLancamento implements CrudLancamentos{
         }
         conexao.fechar();
         
-    }
+    }*/
 	
     @Override
 	public void excluirLancamento(String cod) {
