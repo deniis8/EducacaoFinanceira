@@ -34,6 +34,7 @@ import configuracao.banco.dados.ConexaoBancoDados;
 import consultas.Consultas;
 import crud.CrudCentroDeCusto;
 import crud.CrudLancamento;
+import integracao.GerarCsv;
 import mascaras.Mascaras;
 import recalculo.saldos.RecalculaSaldo;
 
@@ -49,6 +50,7 @@ public class JanelaPrincipal {
 	private JMenuBar menuBar;
 	private JMenu menu;
 	private JMenuItem itemAtuali;
+	private JMenuItem itemGerarCSV;
 	private JMenuItem itemSair;
 	//private JMenu menuRec;
 	//private JMenuItem itemRec;
@@ -139,6 +141,7 @@ public class JanelaPrincipal {
 		menuBar = new JMenuBar();
 		menu = new JMenu("Menu");
 		itemAtuali = new JMenuItem("Atualizar");
+		itemGerarCSV = new JMenuItem("Gerar CSV");
 		itemSair = new JMenuItem("Sair");
 		//menuRec = new JMenu("Recalculo");
 		//itemRec = new JMenuItem("Recalcular Saldo");
@@ -230,6 +233,15 @@ public class JanelaPrincipal {
 				consulta.selectInvV(lblInvV);
 			}
 		});
+		
+		itemGerarCSV.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new GerarCsv();
+				JOptionPane.showMessageDialog(null, "Arquivos gerados com Sucesso!");
+			}
+		});
+		
 		itemSair.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -398,6 +410,7 @@ public class JanelaPrincipal {
 
 	public void menu() {
 		menu.add(itemAtuali);
+		menu.add(itemGerarCSV);
 		menu.add(itemSair);
 		//menuRec.add(itemRec);
 		menuCC.add(itemCC);

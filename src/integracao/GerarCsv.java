@@ -1,4 +1,4 @@
-package testes;
+package integracao;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,6 +9,12 @@ import java.sql.ResultSet;
 import configuracao.banco.dados.ConexaoBancoDados;
 
 public class GerarCsv {
+	
+	public GerarCsv() {
+		lancamentos();
+		saldos();
+		gastosMensais();
+	}
 	
 	ConexaoBancoDados conexao = new ConexaoBancoDados();
 	PreparedStatement pst;
@@ -55,7 +61,7 @@ public class GerarCsv {
 
             writer.write(sb.toString());
             writer.close();
-            System.out.println("Arquivo lancamentos.csv gerado com sucesso!");
+            //System.out.println("Arquivo lancamentos.csv gerado com sucesso!");
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -103,7 +109,7 @@ public class GerarCsv {
 
             writer.write(sb.toString());
             writer.close();
-            System.out.println("Arquivo saldos.csv gerado com sucesso!");
+            //System.out.println("Arquivo saldos.csv gerado com sucesso!");
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -148,18 +154,18 @@ public class GerarCsv {
 
             writer.write(sb.toString());
             writer.close();
-            System.out.println("Arquivo gastoMensal.csv gerado com sucesso!");
+            //System.out.println("Arquivo gastoMensal.csv gerado com sucesso!");
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
     
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 		GerarCsv gs = new GerarCsv();
 		gs.lancamentos();
 		gs.saldos();
 		gs.gastosMensais();
-	}
+	}*/
 
 }

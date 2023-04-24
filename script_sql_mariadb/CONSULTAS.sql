@@ -1,5 +1,5 @@
 -- Cria a base de dados
-CREATE DATABASE GestaoFinanceira; 
+CREATE DATABASE GestaoFinanceira_Dev; 
 
 -- Coloca em uso a base de dados
 USE GestaoFinanceira_Dev; 
