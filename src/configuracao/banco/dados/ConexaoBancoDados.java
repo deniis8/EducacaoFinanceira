@@ -12,7 +12,7 @@ public class ConexaoBancoDados {
     /*
     
     //===================================================
-	// Conexão com MariaDB
+	// Conexï¿½o com MariaDB
 	//===================================================
     private static Connection con = null;
 
@@ -36,15 +36,15 @@ public class ConexaoBancoDados {
     public void fechar() {
         try {
             con.close();
-            //System.out.println("Conexão fechada..."); 
+            //System.out.println("Conexï¿½o fechada..."); 
         } catch (SQLException e) {
-            //System.out.println("Erro ao fechar a conexão | Erro: " + e.getMessage());
+            //System.out.println("Erro ao fechar a conexï¿½o | Erro: " + e.getMessage());
         }
     }*/
 	
 	
 	//===================================================
-	// Conexão com MariaDB
+	// Conexï¿½o com MariaDB
 	//===================================================
 	public String userName, password, url, driver;
 	public Connection con;
@@ -55,15 +55,15 @@ public class ConexaoBancoDados {
     }
 
 	public Connection abrir() {
-		userName = "root";
-		password = "1204";
-		url = "jdbc:mariadb://localhost:3307/GestaoFinanceira";
+		userName = "admin";
+		password = "asvezesfalo8";
+		url = "jdbc:mariadb://192.168.0.110:3306/GestaoFinanceira";
 		driver = "org.mariadb.jdbc.Driver";
 		try {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, userName, password);
 			st = con.createStatement();
-			//System.out.println("Conexão realizada com sucesso");
+			//System.out.println("Conexï¿½o realizada com sucesso");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -73,9 +73,9 @@ public class ConexaoBancoDados {
 	public void fechar() {
         try {
             con.close();
-            //System.out.println("Conexão fechada..."); 
+            //System.out.println("Conexï¿½o fechada..."); 
         } catch (SQLException e) {
-            //System.out.println("Erro ao fechar a conexão | Erro: " + e.getMessage());
+            //System.out.println("Erro ao fechar a conexï¿½o | Erro: " + e.getMessage());
         }
     }
 }
