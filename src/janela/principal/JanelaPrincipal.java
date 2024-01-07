@@ -107,14 +107,14 @@ public class JanelaPrincipal {
 	}
 
 	public void janela() {
-		janela = new JFrame("EducaÁ„o Financeira");
+		janela = new JFrame("Educa√ß√£o Financeira");
 		tabPane = new JTabbedPane();
 		panelGeren = new JPanel();
 		tabPane.addTab("Gerencial", null, panelGeren, null);
 		panelGeren.setLayout(null);
 		panelGeren.setBackground(new Color(200, 200, 200));
 		lblDe = new JLabel("De:");
-		lblAte = new JLabel("AtÈ:");
+		lblAte = new JLabel("At√©:");
 		txtDe = new JDateChooser(new Date(), "dd/MM/yyyy");
 		txtAte = new JDateChooser(new Date(), "dd/MM/yyyy");
 		checRecebido = new JCheckBox("Recebido");
@@ -135,9 +135,9 @@ public class JanelaPrincipal {
 		btnPesq.setBorderPainted(false);
 		btnPesq.setContentAreaFilled(false);
 		btnPesq.setToolTipText("Pesquisar");
-		lblSaldo = new JLabel("Saldo Banc·rio:");
+		lblSaldo = new JLabel("Saldo Banc√°rio:");
 		lblInvF = new JLabel("Investimento Fixo:");
-		lblInvV = new JLabel("Investimento Vari·vel:");
+		lblInvV = new JLabel("Investimento Vari√°vel:");
 		menuBar = new JMenuBar();
 		menu = new JMenu("Menu");
 		itemAtuali = new JMenuItem("Atualizar");
@@ -426,11 +426,11 @@ public class JanelaPrincipal {
 		tblTab = new JTable(model);
 		sp = new JScrollPane(tblTab);
 		//painelTab = new JPanel();
-		model.addColumn("C”DIGO");
-		model.addColumn("EMISS√O");
+		model.addColumn("C√ìDIGO");
+		model.addColumn("EMISS√ÉO");
 		model.addColumn("DIA DA SEMANA");
 		model.addColumn("VALOR");
-		model.addColumn("DESCRI«√O");
+		model.addColumn("DESCRI√á√ÉO");
 		model.addColumn("CENTRO. CUSTO");
 		model.addColumn("STATUS");
 		//painelTab.setLayout(null);
@@ -463,13 +463,13 @@ public class JanelaPrincipal {
 		JLabel lblCod = new JLabel("Cod:");
 		txtCod = new JTextField();
 		txtCod.setEnabled(false);
-		JLabel lblEmissao = new JLabel("Emiss„o:");
+		JLabel lblEmissao = new JLabel("Emiss√£o:");
 		txtEmissao = new JFormattedTextField(Mascaras.mascara("##/##/####"));
 		JLabel lblHora = new JLabel("Hora:");
 		txtHora = new JFormattedTextField(Mascaras.mascara("##:##:##"));
 		JLabel lblValor = new JLabel("Valor:");
 		txtValor = new JTextField();
-		JLabel lblDesc = new JLabel("DescriÁ„o:");
+		JLabel lblDesc = new JLabel("Descri√ß√£o:");
 		txtDesc = new JTextField();
 		JLabel lblStatus = new JLabel("Status:");
 		boxStatus = new JComboBox<>();
@@ -491,7 +491,7 @@ public class JanelaPrincipal {
 		btnConfirm.setBorderPainted(false);
 		btnConfirm.setToolTipText("Confirmar");
 		
-		//Captura a data atual (dia/mÍs/ano)
+		//Captura a data atual (dia/m√™s/ano)
 		Date dt = new Date();
 		SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
 		txtEmissao.setText(formato.format(dt));
@@ -579,7 +579,7 @@ public class JanelaPrincipal {
 						consulta.selectInvV(lblInvV);
 						consulta.selectComboboxCentroCusto(boxCCusto, "S");
 					} else {
-						JOptionPane.showMessageDialog(null, "Favor preencher os campos obrigatÛrios!");
+						JOptionPane.showMessageDialog(null, "Favor preencher os campos obrigat√≥rios!");
 					}
 				} else if (opc == "e") {
 					crudLancamento.alterarLancamento(txtCod.getText(), txtEmissao.getText(), txtHora.getText(),
@@ -593,8 +593,8 @@ public class JanelaPrincipal {
 					consulta.selectInvV(lblInvV);
 					dialogP.dispose();
 				} else if (opc == "ex") {					
-					Object[] options = { "Sim", "N„o", "Cancelar" };
-			    	int resposta = JOptionPane.showOptionDialog(null, "Deseja excluir esse LanÁamento?", "Pergunta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+					Object[] options = { "Sim", "N√£o", "Cancelar" };
+			    	int resposta = JOptionPane.showOptionDialog(null, "Deseja excluir esse Lan√ßamento?", "Pergunta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 					
 					if (resposta == JOptionPane.YES_OPTION) {
 						crudLancamento.excluirLancamento(txtCod.getText());
@@ -650,8 +650,8 @@ public class JanelaPrincipal {
 		modelCC = new DefaultTableModel();
 		tblTabCC = new JTable(modelCC);
 		spCC = new JScrollPane(tblTabCC);
-		modelCC.addColumn("C”DIGO");
-		modelCC.addColumn("DESCRI«√O");
+		modelCC.addColumn("C√ìDIGO");
+		modelCC.addColumn("DESCRI√á√ÉO");
 		spCC.setBounds(03, 40, 400, 315);
 		dialogCC.add(spCC);
 		
@@ -732,9 +732,9 @@ public class JanelaPrincipal {
 				
 		CrudCentroDeCusto crudCentroCusto = new CrudCentroDeCusto();
 		JDialog dialogCC = new JDialog();
-		JLabel lblCodCC = new JLabel("CÛd:");
+		JLabel lblCodCC = new JLabel("C√≥d:");
 		JTextField txtCodCC = new JTextField();
-		JLabel lblDescri = new JLabel("DescriÁ„o:");
+		JLabel lblDescri = new JLabel("Descri√ß√£o:");
 		JTextField txtDescri = new JTextField();
 		JButton btnCancel = new JButton("Cancelar");
 		JButton btnConf = new JButton("Confirmar");
@@ -807,7 +807,7 @@ public class JanelaPrincipal {
 					}
 					
 				}else {
-					Object[] options = { "Sim", "N„o", "Cancelar" };
+					Object[] options = { "Sim", "N√£o", "Cancelar" };
 			    	int resposta = JOptionPane.showOptionDialog(null, "Deseja excluir esse registro?", "Pergunta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 			    	if(resposta==0) {
 			    		crudCentroCusto.excluirCentroCusto(Integer.parseInt(cod));
@@ -846,8 +846,8 @@ public class JanelaPrincipal {
 		String idReg = "";
 		String data = "";
 		//int resposta = JOptionPane.showConfirmDialog(null, "Recalcular Tudo", "Recalcular Tudo", JOptionPane.NO_OPTION);
-		Object[] options = { "Sim", "N„o", "Cancelar" };
-    	int resposta = JOptionPane.showOptionDialog(null, "Deseja recalcular tudo?", "InformaÁ„o", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+		Object[] options = { "Sim", "N√£o", "Cancelar" };
+    	int resposta = JOptionPane.showOptionDialog(null, "Deseja recalcular tudo?", "Informa√ß√£o", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
     	
         if (resposta == 1) {
         	int indiceLinha = tblTab.getSelectedRow();			
