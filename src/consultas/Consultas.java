@@ -42,7 +42,7 @@ public class Consultas {
 		totalP = 0;
 		totalAR = 0;
 		totalR = 0;
-		String sql = "SELECT ID, DATA_HORA, DIAS_SEMANA, VALOR, DESCRICAO, CONCAT_WS(' - ',CODCCUSTO, CCENTRO) AS CENTRO_CUSTO, STATUS_LANC FROM VW_LANCAMENTOS ";
+		String sql = "SELECT ID_LANC, DATA_HORA, DIAS_SEMANA, VALOR, DESCRICAO, CONCAT_WS(' - ',ID_CCUSTO, DESCRI_CC) AS CENTRO_CUSTO, STATUS_LANC FROM VW_LANCAMENTOS ";
 		conexao.abrir();
 		zeraTabelaPrincipal(modTabLanc);
 		try {
@@ -55,7 +55,7 @@ public class Consultas {
 				table.setModel(modTabLanc);
 				if(rs.getString(7).equals("A Pagar")) {
 					totalAP += rs.getDouble(4);
-				}else if(rs.getString(7).equals("Pago")) {
+				}else if(rs.getString(7).equals("Pago") && !rs.getString(6).equals("19 - Investimento Fixo")) {
 					totalP += rs.getDouble(4);
 				}else if(rs.getString(7).equals("A Receber")) {
 					totalAR += rs.getDouble(4);
@@ -150,7 +150,7 @@ public class Consultas {
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			String deN = df.format(de.getDate());
 	        String ateN = df.format(ate.getDate());
-			String query = "SELECT ID, DATA_HORA, DIAS_SEMANA, VALOR, DESCRICAO, CONCAT_WS(' - ',CODCCUSTO, CCENTRO) AS DETALHE_CCUSTO, STATUS_LANC FROM VW_LANCAMENTOS WHERE "; 
+			String query = "SELECT ID_LANC, DATA_HORA, DIAS_SEMANA, VALOR, DESCRICAO, CONCAT_WS(' - ',ID_CCUSTO, DESCRI_CC) AS DETALHE_CCUSTO, STATUS_LANC FROM VW_LANCAMENTOS WHERE "; 
 			
 					
 					if(recebido.isSelected()) {
@@ -167,7 +167,7 @@ public class Consultas {
 					}			
 					query+="STATUS_LANC IN('"+receb+"','"+pag+"','"+aPag+"','"+aReceb+"') AND ";
 					if(!boxCC.getSelectedItem().equals("Todos")) {
-						query+="CCENTRO='"+boxCC.getSelectedItem()+"' AND ";
+						query+="DESCRI_CC='"+boxCC.getSelectedItem()+"' AND ";
 					}					
 					query+="DATA_HORA BETWEEN '"+deN+"' AND '"+ateN+"' ";
 

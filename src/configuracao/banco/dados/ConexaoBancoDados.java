@@ -55,10 +55,22 @@ public class ConexaoBancoDados {
     }
 
 	public Connection abrir() {
-		userName = "admin";
-		password = "asvezesfalo8";
-		url = "jdbc:mariadb://192.168.0.110:3306/GestaoFinanceira";
-		driver = "org.mariadb.jdbc.Driver";
+		
+		int opc = 2;
+		if(opc == 1) {
+			//Servidor
+			userName = "admin";
+			password = "asvezesfalo8";
+			url = "jdbc:mariadb://192.168.1.110:3306/GestaoFinanceira";
+			driver = "org.mariadb.jdbc.Driver";
+		}else if(opc == 2) {
+			//Local		
+			userName = "root";
+			password = "1204";
+			url = "jdbc:mariadb://localhost:3306/GestaoFinanceira";
+			driver = "org.mariadb.jdbc.Driver";
+		}		
+		
 		try {
 			Class.forName(driver);
 			con = DriverManager.getConnection(url, userName, password);
