@@ -56,7 +56,7 @@ public class ConexaoBancoDados {
 
 	public Connection abrir() {
 		
-		int opc = 2;
+		int opc = 1;
 		if(opc == 1) {
 			//Servidor
 			userName = "admin";

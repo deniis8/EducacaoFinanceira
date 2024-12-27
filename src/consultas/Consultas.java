@@ -10,6 +10,8 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -141,35 +143,43 @@ public class Consultas {
 		totalP = 0;
 		totalAR = 0;
 		totalR = 0;
-		String receb = "";
-		String pag = "";
-		String aPag = "";
-		String aReceb = "";
 		if((recebido.isSelected() || pago.isSelected() || aPagar.isSelected() || aReceber.isSelected()) && (de.getDate() != null && ate.getDate() != null)) {
 			zeraTabelaPrincipal(modelo);
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			String deN = df.format(de.getDate());
 	        String ateN = df.format(ate.getDate());
 			String query = "SELECT ID_LANC, DATA_HORA, DIAS_SEMANA, VALOR, DESCRICAO, CONCAT_WS(' - ',ID_CCUSTO, DESCRI_CC) AS DETALHE_CCUSTO, STATUS_LANC FROM VW_LANCAMENTOS WHERE "; 
-			
-					
-					if(recebido.isSelected()) {
-						receb = "Recebido";   
-					}
-					if(pago.isSelected()) {
-						pag = "Pago"; 
-					}
-					if(aPagar.isSelected()) {
-						aPag = "A Pagar"; 
-					}
-					if(aReceber.isSelected()) {
-						aReceb = "A Receber"; 
-					}			
-					query+="STATUS_LANC IN('"+receb+"','"+pag+"','"+aPag+"','"+aReceb+"') AND ";
-					if(!boxCC.getSelectedItem().equals("Todos")) {
-						query+="DESCRI_CC='"+boxCC.getSelectedItem()+"' AND ";
-					}					
-					query+="DATA_HORA BETWEEN '"+deN+"' AND '"+ateN+"' ";
+								
+			List<String> statusList = new ArrayList<>();
+
+			if (recebido.isSelected()) {
+			    statusList.add("Recebido");
+			}
+			if (pago.isSelected()) {
+			    statusList.add("Pago");
+			}
+			if (aPagar.isSelected()) {
+			    statusList.add("A Pagar");
+			}
+			if (aReceber.isSelected()) {
+			    statusList.add("A Receber");
+			}
+
+			// Adiciona a cláusula IN apenas se a lista não estiver vazia
+			if (!statusList.isEmpty()) {
+			    String statusIn = statusList.stream()
+			                                .map(status -> "'" + status + "'")
+			                                .collect(Collectors.joining(", "));
+			    query += "STATUS_LANC IN (" + statusIn + ") AND ";
+			}
+
+			// Verifica se o Centro de Custo está selecionado
+			if (!"Todos".equals(boxCC.getSelectedItem())) {
+			    query += "DESCRI_CC = '" + boxCC.getSelectedItem() + "' AND ";
+			}
+
+			// Adiciona a cláusula de data
+			query += "DATE(DATA_HORA) BETWEEN '" + deN + "' AND '" + ateN + "'";
 
 			conexao.abrir();
 			try {
